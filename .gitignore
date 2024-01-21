@@ -29,4 +29,4 @@ yarn-error.log*
 .eslintcache
 
 /src/firebase/firebaseConfig.js
-/src/firebaseConfig2.d.ts
+/src/firebase/firebaseConfig2.d.ts
