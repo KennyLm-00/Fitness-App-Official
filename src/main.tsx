@@ -26,6 +26,7 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 import './pages/Tab1.css';
 import { doc, setDoc } from 'firebase/firestore';
+import fitlogo from '../images/fitlogo.png';
 
 /* Theme variables */
 import './theme/variables.css';
@@ -132,8 +133,8 @@ const Main: React.FC = () => {
             <IonGrid style={{ background: '#1e1d24' }}>
               <IonRow style={{ background: '#1e1d24' }}>
                 <IonCol style={{ background: '#1e1d24', borderColor:'transparent' }} size="12" size-sm="12">
-                  <IonImg
-                    src="/images/fitlogo.png" // Replace with the actual image URL
+                  <img
+                    src={"../src/images/fitlogo.png"} // Replace with the actual image URL
                     alt="Image Alt Text"
                     style={{ width: '100%', height: '300px' }}
                   />
