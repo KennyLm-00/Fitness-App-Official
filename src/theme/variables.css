@@ -4,7 +4,8 @@ http://ionicframework.com/docs/theming/ */
 /** Ionic CSS Variables **/
 :root {
   /** primary **/
-  --ion-color-primary: #3880ff;
+  --custom-font-family: 'Your Custom Font', sans-serif;
+  --ion-color-primary: rgb(30, 29, 36);
   --ion-color-primary-rgb: 56, 128, 255;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
@@ -76,19 +77,24 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-tint: #f5f6f9;
 }
 
+/*PLEASE DO NOT UNCCOMENT THIS DARK STYLES YET*/
 @media (prefers-color-scheme: dark) {
   /*
    * Dark Colors
    * -------------------------------------------
    */
+  /* body{
+    --ion-color-primary: rgb(30, 29, 36);
+   } */
 
   /* body {
-    --ion-color-primary: #428cff;
-    --ion-color-primary-rgb: 66,140,255;
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255,255,255;
-    --ion-color-primary-shade: #3a7be0;
-    --ion-color-primary-tint: #5598ff;
+    --ion-color-primary: rgb(30, 29, 36);
+    --ion-color-primary2: rgb(30, 29, 36);
+    --ion-color-primary-rgb: 175, 204, 255;
+    --ion-color-primary-contrast: #000000;
+    --ion-color-primary-contrast-rgb: 0, 0, 0;
+    --ion-color-primary-shade: #9ab4e0;
+    --ion-color-primary-tint: #b7d1ff;
 
     --ion-color-secondary: #50c8ff;
     --ion-color-secondary-rgb: 80,200,255;
@@ -151,8 +157,8 @@ http://ionicframework.com/docs/theming/ */
    * iOS Dark Theme
    * -------------------------------------------
    */
-
-  /* .ios body {
+  /* 
+  .ios body {
     --ion-background-color: #000000;
     --ion-background-color-rgb: 0,0,0;
 
@@ -182,21 +188,21 @@ http://ionicframework.com/docs/theming/ */
     --ion-item-background: #000000;
 
     --ion-card-background: #1c1c1d;
-  }
+  } */
 
   .ios ion-modal {
     --ion-background-color: var(--ion-color-step-100);
     --ion-toolbar-background: var(--ion-color-step-150);
     --ion-toolbar-border-color: var(--ion-color-step-250);
-  } */
+  }
 
 
   /*
    * Material Design Dark Theme
    * -------------------------------------------
    */
-
-  /* .md body {
+  /* 
+  .md body {
     --ion-background-color: #121212;
     --ion-background-color-rgb: 18,18,18;
 
@@ -239,4 +245,121 @@ html {
   /* For more information on dynamic font scaling, visit the documentation: 
   https://ionicframework.com/docs/layout/dynamic-font-scaling */
   --ion-dynamic-font: var(--ion-default-dynamic-font);
+}
+
+ion-tab-bar {
+  border-radius: 50px;
+  /* border-top-left-radius: 15px;
+  border-top-right-radius: 15px; */
+  position: absolute;
+  bottom: 5px;
+  width: 80%;
+  left: 39px;
+  /* box-shadow: 0px 17px 62px -5px rgba(0, 0, 0, 0.45); */
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.1px);
+  /* -webkit-backdrop-filter: blur(10.1px); */
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+ion-tab-bar {
+  /* border-top-right-radius: 30px;
+  border-top-left-radius: 30px; */
+  border-radius: none;
+  /* border-top-left-radius: 15px;
+  border-top-right-radius: 15px; */
+  /* position: absolute;
+  bottom: 10px; */
+  /* width: 80%;
+  left: 40px; */
+  /* box-shadow: 0px 17px 62px -5px rgba(0, 0, 0, 0.45); */
+  /* From https://css.glass */
+  /* --background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10.1px); */
+  /* -webkit-backdrop-filter: blur(10.1px); */
+  /* border: none;
+  height: 60px; */
+}
+ion-tab-button {
+  background-color: transparent;
+  font-family: "Montserrat Alternates", sans-serif;
+
+}
+
+ion-tab-button.tab-selected {
+  color: #ffb057;
+}
+
+.header-md {
+  box-shadow: none;
+}
+
+ion-header {
+  border-color: transparent;
+  background-color: transparent;
+} 
+
+ion-toolbar {
+  --background: rgba(51, 84, 85, 0.39);
+  --border-color: transparent;
+  font-family: "Montserrat Alternates", sans-serif;
+  /* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; */
+  padding: 0.4rem;
+  border-bottom-left-radius: 45px;
+  border-bottom-right-radius: 45px;
+  box-shadow: rgba(81, 81, 92, 0.2) 0px 7px 29px 0px;
+}
+
+ion-card {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  /* background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); */
+  /* backdrop-filter: blur(50px); */
+  /* -webkit-backdrop-filter: blur(5px); */
+  /* border: 1px solid rgba(255, 255, 255, 0.3); */
+  /* backdrop-filter: blur(16px) saturate(180%); */
+  /* -webkit-backdrop-filter: blur(16px) saturate(180%); */
+  background-color: rgba(59, 59, 59, 0.25);
+  border-radius: 25px;
+  /* border: 1px solid rgba(255, 255, 255, 0.603);   */
+  filter: drop-shadow(0 30px 10px rgba(0,0,0,0.125));
+  filter: saturate(120%);
+  width: 100%;
+  margin: auto;
+  font-family: "Montserrat Alternates", sans-serif;
+  /* padding:2px; */
+  /* background: rgb(152, 213, 255);
+  background: linear-gradient(90deg, rgba(152, 213, 255, 1) 0%, rgba(158, 194, 255, 1) 35%, rgba(117, 232, 255, 1) 100%); */
+
+}
+
+ion-chip {
+  /* background: linear-gradient(90deg, rgba(228, 252, 253, 0.645) 0%, rgba(150, 210, 255, 1) 35%, rgb(191, 239, 255) 100%); */
+  background: rgba(92, 128, 205, 0.473);
+  color: white;
+
+}
+ion-label{
+  font-family: "Montserrat Alternates", sans-serif;
+  font-weight: 300 !important;
+  font-size: 0.8rem;
+}
+ion-card-title {
+  
+  font-family: "Montserrat Alternates", sans-serif;
+  color: white;
+}
+ion-title{
+  color: white;
+  font-family: "Montserrat Alternates", sans-serif;
+}
+ion-label{
+  font-family: "Montserrat Alternates", sans-serif;
+}
+ion-text{
+  font-family: "Montserrat Alternates", sans-serif;
 }
