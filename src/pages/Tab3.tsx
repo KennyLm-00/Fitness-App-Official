@@ -27,7 +27,7 @@ import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, heart, heartOutline } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline } from 'ionicons/icons';
 import DetailedView from './DetailedView'; // Import DetailedView
 
 const Tab3: React.FC = () => {
@@ -214,14 +214,12 @@ const Tab3: React.FC = () => {
         <IonHeader translucent={false}>
           <IonToolbar>
             <IonButtons slot="start">
-              {userImageUrl && (
-                <img
-                  className='profile-image'
-                  style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
-                  src={userImageUrl}
-                  alt="User Profile Picture"
-                />
-              )}
+              <img
+                className='profile-image'
+                style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
+                src={updatedImageUrl || auth.currentUser?.photoURL || ''}
+                alt="User Profile Picture"
+              />
             </IonButtons>
             <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>{username ? `${username}` : 'Loading user...'}</IonCardSubtitle>
             <IonButtons slot="end">
@@ -246,12 +244,17 @@ const Tab3: React.FC = () => {
                   </IonCol>
                   <IonCol size="6" style={{ marginTop: '30px', }}>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
+                      <IonIcon icon={person} style={{ fontSize: '1.5rem', verticalAlign: 'middle' }} />
+                      &nbsp;
+                      {username ? `${username}` : 'Loading user...'}
+                    </IonCardSubtitle>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
                       <IonIcon icon={barbell} style={{ fontSize: '1.5rem', verticalAlign: 'middle' }} />
                       &nbsp;
                       Lift Category
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
-                      <IonIcon icon={location} style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+                      <IonIcon icon={location} style={{ fontSize: '1.2rem', verticalAlign: 'middle',color: '#ffb057' }} />
                       &nbsp;
                       Idaho
                     </IonCardSubtitle>
@@ -302,10 +305,10 @@ const Tab3: React.FC = () => {
 
                       {/* Followers */}
                       <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
                           500
                           <br />
-                          Followers
+                          Friends
                         </IonCardSubtitle>
                       </IonCol>
 
@@ -314,7 +317,7 @@ const Tab3: React.FC = () => {
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                           300
                           <br />
-                          Following
+                          Workouts
                         </IonCardSubtitle>
                       </IonCol>
                     </IonRow>
@@ -323,24 +326,22 @@ const Tab3: React.FC = () => {
               </IonCard>
             </IonCol>
             <IonCol size="12">
-              {/* <IonCardHeader>
-                  <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
-                </IonCardHeader> */}
-              <IonGrid>
-                <IonRow>
+              <IonCardHeader>
+                <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Posts</IonCardSubtitle>
+              </IonCardHeader>
+              <IonGrid style={{ padding: '0px' }}>
+                <IonRow style={{ padding: '0px' }}>
                   {posts.map((post) => (
-                    <IonCol key={post.id} size="6" size-md="4">
-                      <IonCard onClick={() => handlePostClick(post)}>
-                        <IonCardHeader>
+                    <IonCol key={post.id} size="6" size-md="4" style={{ padding: '1px' }}>
+                      <IonCard onClick={() => handlePostClick(post)} style={{ borderRadius: '0px' }}>
+                        {/* <IonCardHeader>
                           <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                             Post
                           </IonCardSubtitle>
-                        </IonCardHeader>
-                        <IonCardContent>
-                          {post.imageUrl && (
-                            <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '8px' }} />
-                          )}
-                        </IonCardContent>
+                        </IonCardHeader> */}
+                        {post.imageUrl && (
+                          <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '0px' }} />
+                        )}
                       </IonCard>
                     </IonCol>
                   ))}

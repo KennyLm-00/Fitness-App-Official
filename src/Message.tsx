@@ -26,6 +26,7 @@ import {
   IonCardSubtitle,
   IonFabButton,
   IonFab,
+  IonInput,
   IonFabList,
   IonIcon
 } from '@ionic/react';
@@ -34,7 +35,7 @@ import { getDocs, collection, addDoc, onSnapshot, query, where, orderBy } from '
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
-import { arrowUpCircle, addCircle, images, imageOutline } from 'ionicons/icons';
+import { arrowUpCircle, addCircle, images, imageOutline, search } from 'ionicons/icons';
 
 interface User {
   id: string;
@@ -56,6 +57,8 @@ const Message: React.FC = () => {
   const [recipientId, setRecipientId] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [recentChats, setRecentChats] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   const userId = auth.currentUser?.uid;
   useEffect(() => {
     const fetchUsers = async () => {
@@ -132,24 +135,38 @@ const Message: React.FC = () => {
       <IonMenu contentId="main-content">
         <IonList>
           <IonCardHeader>
-            <IonCardSubtitle style={{ textAlign: 'center' }}>Recent Chats</IonCardSubtitle>
+            <IonCardSubtitle style={{ textAlign: 'center',color:'white' }}>Recent Chats</IonCardSubtitle>
           </IonCardHeader>
+
+          {/* Add search bar with icon */}
+          <IonItem>
+            <IonIcon icon={search} slot="start" style={{ marginRight: '8px' }} />
+            <IonInput
+              placeholder="Search users"
+              value={searchTerm}
+              onIonChange={(e) => setSearchTerm(e.detail.value!)}
+            ></IonInput>
+          </IonItem>
+
           {/* Display users in the menu if available */}
           {users.length > 0 ? (
-            users.map((user) => (
-              <IonItem key={user.id} onClick={() => setRecipientId(user.id)}>
-                <IonAvatar slot="start">
-                  <img src={user.photoURL || 'default_avatar_url'} alt="Avatar" />
-                </IonAvatar>
-                <IonText>{user.username}</IonText>
-              </IonItem>
-            ))
+            users
+              .filter((user) =>
+                user.username.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((user) => (
+                <IonItem key={user.id} onClick={() => setRecipientId(user.id)}>
+                  <IonAvatar slot="start">
+                    <img src={user.photoURL || 'default_avatar_url'} alt="Avatar" />
+                  </IonAvatar>
+                  <IonText>{user.username}</IonText>
+                </IonItem>
+              ))
           ) : (
             <IonItem>No users available</IonItem>
           )}
         </IonList>
       </IonMenu>
-
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start" >
@@ -162,6 +179,9 @@ const Message: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent id='main-content' fullscreen style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+        <IonCardSubtitle className='ion-text-center' style={{ color: 'white', paddingTop: "10px" }}>
+          {recipientId && users.find((user) => user.id === recipientId)?.username}
+        </IonCardSubtitle>
         <div style={{ flex: 1, overflowY: 'auto', padding: '10px', zIndex: 1, maxHeight: 'calc(100% - 120px)' }}>
           {/* Display messages */}
           {messages.map((message) => (

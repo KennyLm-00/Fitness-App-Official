@@ -33,3 +33,23 @@ ion-content.home {
     cursor: pointer;
     font-weight: bold;
   }
+ion-item{
+    --ion-item-background:#1b221f;
+    color:white;
+}
+ion-list{
+  --ion-item-background:#1b221f;
+
+}
+ion-menu {
+  --ion-background-color:#1b221f;
+  /* --ion-text-color: var(--ion-color-primary-contrast);
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+  }
+
+  ion-list {
+    background: transparent;
+  } */
+}
