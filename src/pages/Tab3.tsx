@@ -17,24 +17,32 @@ import {
   IonCardContent,
   IonIcon,
   IonAvatar,
+  IonModal,
   IonCardSubtitle
 } from '@ionic/react';
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { getDocs, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
-import { imageOutline, trashOutline } from 'ionicons/icons';
-import { barbell, checkmark, location, personAdd } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import { CiShare1 } from "react-icons/ci";
+import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, heart, heartOutline } from 'ionicons/icons';
+import DetailedView from './DetailedView'; // Import DetailedView
 
 const Tab3: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(auth.currentUser?.photoURL || null);
   const [updatedImageUrl, setUpdatedImageUrl] = useState<string | null>(null); // New state to manage updated image URL
   const username = auth.currentUser?.displayName || ''; // Get the username
-  const [posts, setPosts] = useState<{ id: string; imageUrl?: string }[]>([]);
+  const [posts, setPosts] = useState<{ id: string; imageUrl?: string; likedBy: string[]; likes: number }[]>([]);
   const history = useHistory();
   const [userImageUrl, setUserImageUrl] = useState<string>('');
+  // const [selectedPost, setSelectedPost] = useState<{ id: string; imageUrl?: string | undefined } | null>(null);
+  const [selectedPost, setSelectedPost] = useState<{
+    id: string; imageUrl?: string |
+    undefined; likes: number; likedBy: string[]
+  } | null>(null);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -54,7 +62,9 @@ const Tab3: React.FC = () => {
 
           const userPostsData = querySnapshot.docs.map((doc) => ({
             id: doc.id,
-            imageUrl: doc.data().imageUrl, // Include the imageUrl property
+            imageUrl: doc.data().imageUrl,
+            likedBy: doc.data().likedBy, // Include likedBy property
+            likes: doc.data().likes, // Include likes property
             // Add other necessary fields from your Firestore document
           }));
 
@@ -67,6 +77,12 @@ const Tab3: React.FC = () => {
 
     fetchUserPosts();
   }, [history]);
+  const handlePostClick = (post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] }) => {
+    setSelectedPost(post);
+  };
+  const closeDetailedView = () => {
+    setSelectedPost(null);
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,13 +133,102 @@ const Tab3: React.FC = () => {
       console.error('Error updating profile picture:', error.message);
     }
   };
+  const handleLogout = async () => {
+    try {
+      console.log('Logging out...');
+      await auth.signOut(); // Sign out the user
+      localStorage.removeItem('user');
+      console.log('Redirecting to /Google...');
+      history.replace('/'); // Redirect to login page after logout
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+  const [liked, setLiked] = useState(false);
+
+  const handleLike = async (postId: string, userId: string) => {
+    try {
+      // Find the post in the state based on postId
+      const likedPostIndex = posts.findIndex((post) => post.id === postId);
+
+      if (likedPostIndex !== -1) {
+        const likedBy = posts[likedPostIndex].likedBy;
+
+        // Check if the user has already liked the post
+        const alreadyLiked = likedBy.includes(userId);
+
+        if (alreadyLiked) {
+          // User has already liked the post, so remove the like
+          const updatedLikedBy = likedBy.filter((id: string) => id !== userId);
+
+          // Update the state and wait for it to complete
+          setPosts((prevPosts) => {
+            const updatedPosts = [...prevPosts];
+            updatedPosts[likedPostIndex] = {
+              ...updatedPosts[likedPostIndex],
+              likes: updatedLikedBy.length,
+              likedBy: updatedLikedBy,
+            };
+            return updatedPosts;
+          });
+
+          // Update the likes count and likedBy array in Firestore
+          const postRef = doc(firestore, 'posts', postId);
+          await updateDoc(postRef, {
+            likes: updatedLikedBy.length,
+            likedBy: updatedLikedBy,
+          });
+        } else {
+          // User has not liked the post, so add the like
+          const updatedLikedBy = [...likedBy, userId];
+
+          // Update the state and wait for it to complete
+          setPosts((prevPosts) => {
+            const updatedPosts = [...prevPosts];
+            updatedPosts[likedPostIndex] = {
+              ...updatedPosts[likedPostIndex],
+              likes: updatedLikedBy.length,
+              likedBy: updatedLikedBy,
+            };
+            return updatedPosts;
+          });
+
+          // Update the likes count and likedBy array in Firestore
+          const postRef = doc(firestore, 'posts', postId);
+          await updateDoc(postRef, {
+            likes: updatedLikedBy.length,
+            likedBy: updatedLikedBy,
+          });
+        }
+      } else {
+        console.log('Post not found.');
+      }
+    } catch (error) {
+      console.error('Could not like/unlike post: ', error);
+    }
+  };
 
   return (
     <IonPage>
       <IonContent fullscreen>
         <IonHeader translucent={false}>
           <IonToolbar>
-            <IonCardSubtitle className='ion-text-center' style={{ fontSize: '14px', color: 'white', fontWeight: '600', margin: 'auto' }}>{username}</IonCardSubtitle>
+            <IonButtons slot="start">
+              {userImageUrl && (
+                <img
+                  className='profile-image'
+                  style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
+                  src={userImageUrl}
+                  alt="User Profile Picture"
+                />
+              )}
+            </IonButtons>
+            <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>{username ? `${username}` : 'Loading user...'}</IonCardSubtitle>
+            <IonButtons slot="end">
+              <IonButton href="/" onClick={handleLogout}>
+                <IonIcon style={{ color: 'white' }} icon={logOutOutline}></IonIcon>
+              </IonButton>
+            </IonButtons>
           </IonToolbar>
         </IonHeader>
         <IonGrid>
@@ -178,7 +283,7 @@ const Tab3: React.FC = () => {
                 <IonIcon icon={checkmark} style={{ color: 'white', fontSize: '15px', background: 'steelblue', padding: '0.8rem', borderRadius: '50px' }} onClick={handleUpdateProfilePicture} />
               </IonCol>
             </IonCol>
-              <IonCol size="12">
+            <IonCol size="12">
               <IonCard>
                 {/* <IonCardHeader>
                   <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
@@ -218,34 +323,49 @@ const Tab3: React.FC = () => {
               </IonCard>
             </IonCol>
             <IonCol size="12">
-                {/* <IonCardHeader>
+              {/* <IonCardHeader>
                   <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
                 </IonCardHeader> */}
-                  <IonGrid>
-                    <IonRow>
-                      {posts.map((post) => (
-                        <IonCol key={post.id} size="6" size-md="4">
-                          <IonCard>
-                            <IonCardHeader>
-                              <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                                Post
-                              </IonCardSubtitle>
-                            </IonCardHeader>
-                            <IonCardContent>
-                              {post.imageUrl && (
-                                <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '8px' }} />
-                              )}
-                            </IonCardContent>
-                          </IonCard>
-                        </IonCol>
-                      ))}
-                    </IonRow>
-                  </IonGrid>
+              <IonGrid>
+                <IonRow>
+                  {posts.map((post) => (
+                    <IonCol key={post.id} size="6" size-md="4">
+                      <IonCard onClick={() => handlePostClick(post)}>
+                        <IonCardHeader>
+                          <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                            Post
+                          </IonCardSubtitle>
+                        </IonCardHeader>
+                        <IonCardContent>
+                          {post.imageUrl && (
+                            <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '8px' }} />
+                          )}
+                        </IonCardContent>
+                      </IonCard>
+                    </IonCol>
+                  ))}
+                </IonRow>
+                <IonRow>
+                  {/* Detailed view */}
+                  {selectedPost && (
+                    <IonModal isOpen={true} onDidDismiss={closeDetailedView}>
+                      <DetailedView
+                        post={selectedPost}
+                        username={username}
+                        onClose={closeDetailedView}
+                        onLike={(postId) => handleLike(postId, username)}
+                      />
+                    </IonModal>
+                  )}
+
+
+                </IonRow>
+              </IonGrid>
             </IonCol>
           </IonRow>
         </IonGrid>
       </IonContent>
-    </IonPage>
+    </IonPage >
   );
 };
 
