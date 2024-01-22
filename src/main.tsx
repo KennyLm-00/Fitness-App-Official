@@ -136,7 +136,7 @@ const Main: React.FC = () => {
                   <img
                     src={"../src/images/fitlogo.png"} // Replace with the actual image URL
                     alt="Image Alt Text"
-                    style={{ width: '100%', height: '300px' }}
+                    style={{ height: '300px' }}
                   />
                   <p style={{ fontSize: '18px', color: 'lightskyblue', textAlign: 'center', marginTop: '10px' }}>
                     Welcome to Find-Fit! Please login or create a new account to continue.

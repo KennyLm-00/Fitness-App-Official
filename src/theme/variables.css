@@ -363,3 +363,12 @@ ion-label{
 ion-text{
   font-family: "Montserrat Alternates", sans-serif;
 }
+ion-fab-button{
+  /* width: 40px; */
+  --background:transparent !important;
+  --box-shadow:none;
+}
+ion-fab{
+  left: 0;
+  box-shadow:none !important;
+}

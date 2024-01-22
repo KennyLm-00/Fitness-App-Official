@@ -23,13 +23,18 @@ import {
   IonMenuButton,
   IonRouterOutlet,
   IonMenuToggle,
-  IonCardSubtitle
+  IonCardSubtitle,
+  IonFabButton,
+  IonFab,
+  IonFabList,
+  IonIcon
 } from '@ionic/react';
 import { auth, firestore } from './firebase/firebaseConfig';
 import { getDocs, collection, addDoc, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
+import { arrowUpCircle, addCircle, images, imageOutline } from 'ionicons/icons';
 
 interface User {
   id: string;
@@ -50,55 +55,56 @@ const Message: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const [users, setUsers] = useState<User[]>([]);
-  const contentRef = useRef<HTMLIonContentElement | null>(null);
   const [recentChats, setRecentChats] = useState<string[]>([]);
-
   const userId = auth.currentUser?.uid;
   useEffect(() => {
-    const unsubscribeUsers = onSnapshot(collection(firestore, 'users'), (snapshot) => {
-      const usersData: User[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        username: doc.data().username,
-        photoURL: doc.data().photoURL
-      } as User));
+    const fetchUsers = async () => {
+      const usersSnapshot = await getDocs(collection(firestore, 'users'));
+      const usersData: User[] = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as User));
       setUsers(usersData);
-    });
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!recipientId) return;
 
     const unsubscribeMessages = onSnapshot(
       query(collection(firestore, 'messages'), orderBy('timestamp', 'asc')),
       (snapshot) => {
         const messagesData: Message[] = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
-        setMessages(messagesData.filter((message) => message.senderId === userId || message.recipientId === userId));
+
+        const filteredMessages = messagesData.filter(
+          (message) =>
+            (message.senderId === userId && message.recipientId === recipientId) ||
+            (message.senderId === recipientId && message.recipientId === userId)
+        );
+
+        setMessages(filteredMessages);
       }
     );
 
     return () => {
-      unsubscribeUsers();
       unsubscribeMessages();
     };
-  }, [userId]);
-
-
+  }, [userId, recipientId]);
 
   const sendMessage = async () => {
     if (newMessage.trim() === '' || recipientId.trim() === '') return;
 
-    const recipient = users.find((user) => user.username.toLowerCase() === recipientId.toLowerCase());
-
-    if (!recipient) {
-      console.error('Recipient not found');
-      return;
-    }
-
     await addDoc(collection(firestore, 'messages'), {
       content: newMessage,
       senderId: userId!,
-      recipientId: recipient.id,
+      recipientId,
       timestamp: new Date().toISOString(),
     });
 
     setNewMessage('');
   };
+
+
+
   const updateRecentChats = (recipient: string) => {
     // Add the recipient to the recent chats list
     setRecentChats((prevChats) => {
@@ -109,6 +115,17 @@ const Message: React.FC = () => {
       return updatedChats;
     });
   };
+  // Add this function
+  // Add this function with TypeScript types
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const formattedTime = `${hours % 12 || 12}:${minutes} ${period}`;
+    return `${formattedDate} ${formattedTime}`;
+  };
 
   return (
     <IonPage>
@@ -117,19 +134,22 @@ const Message: React.FC = () => {
           <IonCardHeader>
             <IonCardSubtitle style={{ textAlign: 'center' }}>Recent Chats</IonCardSubtitle>
           </IonCardHeader>
-          {/* Display users in the menu */}
-          {users.map((user) => (
-            <IonItem key={user.id} onClick={() => setRecipientId(user.username)}>
-              <IonAvatar slot="start">
-                <img src={user.photoURL || 'default_avatar_url'} alt="Avatar" />
-              </IonAvatar>
-              <IonText>{user.username}</IonText>
-            </IonItem>
-          ))}
-
-          {/* Other menu items */}
+          {/* Display users in the menu if available */}
+          {users.length > 0 ? (
+            users.map((user) => (
+              <IonItem key={user.id} onClick={() => setRecipientId(user.id)}>
+                <IonAvatar slot="start">
+                  <img src={user.photoURL || 'default_avatar_url'} alt="Avatar" />
+                </IonAvatar>
+                <IonText>{user.username}</IonText>
+              </IonItem>
+            ))
+          ) : (
+            <IonItem>No users available</IonItem>
+          )}
         </IonList>
       </IonMenu>
+
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start" >
@@ -141,78 +161,76 @@ const Message: React.FC = () => {
           <IonTitle>Messages</IonTitle>
         </IonToolbar>
       </IonHeader>
-
-      <IonContent id='main-content' fullscreen>
-        <IonCard style={{ boxShadow: 'none', background: 'transparent' }}>
-          <IonCardHeader>
-            <IonCardTitle style={{ fontSize: '1rem', fontWeight: '500', textAlign: 'center' }}>
-              {users.find((user) => user.username === recipientId)?.username}
-            </IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Display messages */}
-            {/* Display messages in reverse order (most recent at the bottom) */}
-            {/* Display messages in reverse order (most recent at the bottom) */}
-            {/* Display messages in natural order (most recent at the bottom) */}
-            <div style={{ flex: 1, overflowY: 'auto', marginBottom: '10px' }}>
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  style={{
-                    display: 'flex',
-                    flexDirection: userId === message.senderId ? 'row-reverse' : 'row',
-                    alignItems: 'flex-end',  // Align to the bottom
-                    marginBottom: '10px'
-                  }}
-                >
-                  <IonAvatar>
-                    <img src={message.senderId ? users.find((user) => user.id === message.senderId)?.photoURL || 'default_avatar_url' : 'default_avatar_url'} alt="Avatar" />
-                  </IonAvatar>
-
-                  <IonLabel
-                    style={{
-                      marginLeft: userId === message.senderId ? '0' : '10px',
-                      marginRight: userId === message.senderId ? '10px' : '0',
-                      padding: '10px',
-                      borderRadius: '10px',
-                      background: message.senderId === userId ? 'lightblue' : 'lightgreen'
-                    }}
-                  >
-                    {message.content}
-                    <div style={{ fontSize: '0.8em', textAlign: 'right' }}>{message.timestamp}</div>
-                  </IonLabel>
-                </div>
-              ))}
-            </div>
-
-
-            {/* Input for new message */}
-            {/* <IonSelect
-              placeholder="Select recipient"
-              value={recipientId}
-              onIonChange={(e) => setRecipientId(e.detail.value)}
-              style={{ marginBottom: '10px', color: 'white', fontWeight: 'bold' }}
+      <IonContent id='main-content' fullscreen style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '10px', zIndex: 1, maxHeight: 'calc(100% - 120px)' }}>
+          {/* Display messages */}
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              style={{
+                display: 'flex',
+                flexDirection: userId === message.senderId ? 'row-reverse' : 'row',
+                alignItems: 'flex-end',
+                marginBottom: '10px'
+              }}
             >
-              {users.map((user) => (
-                <IonSelectOption key={user.id} value={user.username}>
-                  {user.username}
-                </IonSelectOption>
-              ))}
-            </IonSelect> */}
-            <IonTextarea
-              value={newMessage}
-              placeholder="Type your message..."
-              onIonChange={(e) => setNewMessage(e.detail.value!)}
-              style={{ marginBottom: '10px', color: 'white' }}
-            />
-            <IonButton onClick={sendMessage}>
-              Send 
-              &nbsp;
-            <IoSend />
-            </IonButton>
-          </IonCardContent>
-        </IonCard>
+              <IonAvatar>
+                <img src={message.senderId ? users.find((user) => user.id === message.senderId)?.photoURL || 'default_avatar_url' : 'default_avatar_url'} alt="Avatar" />
+              </IonAvatar>
+
+              <IonLabel
+                style={{
+                  marginLeft: userId === message.senderId ? '0' : '10px',
+                  marginRight: userId === message.senderId ? '10px' : '0',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  background: message.senderId === userId ? 'lightblue' : 'lightgreen'
+                }}
+              >
+                {message.content}
+                <div style={{ fontSize: '0.8em', textAlign: 'left' }}>
+                  {formatTimestamp(message.timestamp)}
+                </div>
+              </IonLabel>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ position: 'fixed', bottom: 60, width: '100%', padding: '10px', borderTop: '1px solid #ccc', display: 'flex', zIndex: 2 }}>
+          <IonFab slot="fixed" vertical="bottom" horizontal="start"
+            style={{ padding: '0', background: 'transparent' }}>
+            <IonFabButton>
+              <IonIcon icon={addCircle} style={{ background: 'transparent', fontSize: '2.3rem', color: '#ffb057' }}></IonIcon>
+            </IonFabButton>
+            <IonFabList side="top">
+              <IonFabButton>
+                <IonIcon icon={imageOutline} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
+              </IonFabButton>
+              <IonFabButton>
+                <IonIcon icon={addCircle} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
+              </IonFabButton>
+              <IonFabButton>
+                <IonIcon icon={addCircle} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
+              </IonFabButton>
+            </IonFabList>
+          </IonFab>
+
+          <textarea
+            value={newMessage}
+            placeholder="Type your message..."
+            onChange={(e) => setNewMessage(e.target.value)}
+            style={{ flex: 1, marginLeft: '45px', marginRight: '5px', color: 'white', background: 'darkslategray' }}
+          />
+
+          <button style={{ background: 'transparent', fontSize: '2.3rem', color: '#ffb057' }} onClick={sendMessage}>
+            <IonIcon icon={arrowUpCircle} />
+          </button>
+        </div>
+
+
       </IonContent>
+
+
     </IonPage>
 
   );
