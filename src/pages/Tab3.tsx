@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   IonContent,
   IonHeader,
@@ -21,16 +21,52 @@ import {
 } from '@ionic/react';
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore'; // Add this import
+import { getDocs, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { imageOutline, trashOutline } from 'ionicons/icons';
 import { barbell, checkmark, location, personAdd } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 
 const Tab3: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(auth.currentUser?.photoURL || null);
   const [updatedImageUrl, setUpdatedImageUrl] = useState<string | null>(null); // New state to manage updated image URL
   const username = auth.currentUser?.displayName || ''; // Get the username
+  const [posts, setPosts] = useState<{ id: string; imageUrl?: string }[]>([]);
+  const history = useHistory();
+  const [userImageUrl, setUserImageUrl] = useState<string>('');
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) {
+          console.error('User not authenticated.');
+          history.push('/');
+        } else {
+          const userId = user.uid;
+
+          // Fetch posts for the current user from Firestore
+          const userPostsCollection = collection(firestore, 'posts');
+          const userPostsQuery = query(userPostsCollection, where('userId', '==', userId));
+          const querySnapshot = await getDocs(userPostsQuery);
+
+          const userPostsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            imageUrl: doc.data().imageUrl, // Include the imageUrl property
+            // Add other necessary fields from your Firestore document
+          }));
+
+          setPosts(userPostsData);
+        }
+      } catch (error) {
+        console.error('Error retrieving user posts:', error);
+      }
+    };
+
+    fetchUserPosts();
+  }, [history]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +123,7 @@ const Tab3: React.FC = () => {
       <IonContent fullscreen>
         <IonHeader translucent={false}>
           <IonToolbar>
-              <IonCardSubtitle className='ion-text-center' style={{ fontSize: '14px', color: 'white', fontWeight: '600', margin:'auto' }}>{username}</IonCardSubtitle>
+            <IonCardSubtitle className='ion-text-center' style={{ fontSize: '14px', color: 'white', fontWeight: '600', margin: 'auto' }}>{username}</IonCardSubtitle>
           </IonToolbar>
         </IonHeader>
         <IonGrid>
@@ -104,17 +140,17 @@ const Tab3: React.FC = () => {
                     )}
                   </IonCol>
                   <IonCol size="6" style={{ marginTop: '30px', }}>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize:'1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
                       <IonIcon icon={barbell} style={{ fontSize: '1.5rem', verticalAlign: 'middle' }} />
                       &nbsp;
                       Lift Category
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize:'1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
                       <IonIcon icon={location} style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
                       &nbsp;
                       Idaho
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize:'1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
                       <IonIcon icon={personAdd} style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
                       &nbsp;
                       Add
@@ -142,7 +178,7 @@ const Tab3: React.FC = () => {
                 <IonIcon icon={checkmark} style={{ color: 'white', fontSize: '15px', background: 'steelblue', padding: '0.8rem', borderRadius: '50px' }} onClick={handleUpdateProfilePicture} />
               </IonCol>
             </IonCol>
-            <IonCol size="12">
+              <IonCol size="12">
               <IonCard>
                 {/* <IonCardHeader>
                   <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
@@ -181,62 +217,31 @@ const Tab3: React.FC = () => {
                 </IonCardContent>
               </IonCard>
             </IonCol>
-            <IonRow style={{margin:'auto'}}>
-              {/* Card 1 */}
-              <IonCol size="6" size-md="4">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                      Post
-                    </IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    <img src="https://placekitten.com/200/300" alt="Card 1" style={{ width: '100%', borderRadius: '8px' }} />
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-
-              {/* Card 2 */}
-              <IonCol size="6" size-md="4">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                      Post
-                    </IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    <img src="https://placekitten.com/201/301" alt="Card 2" style={{ width: '100%', borderRadius: '8px' }} />
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-
-              {/* Card 3 */}
-              <IonCol size="6" size-md="4">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                    Post
-                    </IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    <img src="https://placekitten.com/202/302" alt="Card 3" style={{ width: '100%', borderRadius: '8px' }} />
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-              <IonCol size="6" size-md="4">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                    Post
-                    </IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    <img src="https://placekitten.com/202/302" alt="Card 3" style={{ width: '100%', borderRadius: '8px' }} />
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-              {/* Repeat for more cards */}
-            </IonRow>
+            <IonCol size="12">
+                {/* <IonCardHeader>
+                  <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
+                </IonCardHeader> */}
+                  <IonGrid>
+                    <IonRow>
+                      {posts.map((post) => (
+                        <IonCol key={post.id} size="6" size-md="4">
+                          <IonCard>
+                            <IonCardHeader>
+                              <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                                Post
+                              </IonCardSubtitle>
+                            </IonCardHeader>
+                            <IonCardContent>
+                              {post.imageUrl && (
+                                <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '8px' }} />
+                              )}
+                            </IonCardContent>
+                          </IonCard>
+                        </IonCol>
+                      ))}
+                    </IonRow>
+                  </IonGrid>
+            </IonCol>
           </IonRow>
         </IonGrid>
       </IonContent>
