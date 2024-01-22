@@ -154,12 +154,24 @@ const Tab2: React.FC = () => {
                       <IonLabel>{user?.displayName || 'Username'}</IonLabel>
                     </IonChip>
                   </IonCardSubtitle>
+                  <IonSelect
+                      value={selectedCategory}
+                      placeholder="Select category"
+                      onIonChange={handleCategoryChange}
+                      style={{ color: 'white', borderBottom: '1px solid lightgrey' }}
+                    >
+                      <IonSelectOption value="bodybuilding">Bodybuilding</IonSelectOption>
+                      <IonSelectOption value="calisthenics">Calisthenics</IonSelectOption>
+                      <IonSelectOption value="crossfit">CrossFit</IonSelectOption>
+                      <IonSelectOption value="powerlifting">Powerlifting</IonSelectOption>
+                      {/* Add more categories as needed */}
+                    </IonSelect>
                   <IonCardContent>
                     <IonInput
                       style={{ color: 'white', borderBottom: '1px solid lightgrey' }}
                       value={inputValue}
                       onIonChange={handleInputChange}
-                      placeholder="What do you want to talk about?"
+                      placeholder="What'd you lift today?"
                     />
                     {imagePreview && (
                       <img src={imagePreview} alt="Selected" style={{ width: '100%', marginTop: '10px' }} />
@@ -185,18 +197,7 @@ const Tab2: React.FC = () => {
                       style={{ background: 'transparent', color: 'white', fontSize: '30px', float: 'right' }}
                       onClick={handlePost}
                     ></IonIcon>
-                    <IonSelect
-                      value={selectedCategory}
-                      placeholder="Select category"
-                      onIonChange={handleCategoryChange}
-                      style={{ color: 'white', borderBottom: '1px solid lightgrey' }}
-                    >
-                      <IonSelectOption value="bodybuilding">Bodybuilding</IonSelectOption>
-                      <IonSelectOption value="calisthenics">Calisthenics</IonSelectOption>
-                      <IonSelectOption value="crossfit">CrossFit</IonSelectOption>
-                      <IonSelectOption value="powerlifting">Powerlifting</IonSelectOption>
-                      {/* Add more categories as needed */}
-                    </IonSelect>
+            
                   </IonCardContent>
                 </IonCard>
               </IonCol>

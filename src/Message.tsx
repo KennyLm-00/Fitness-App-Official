@@ -197,14 +197,14 @@ const Message: React.FC = () => {
               <IonAvatar>
                 <img src={message.senderId ? users.find((user) => user.id === message.senderId)?.photoURL || 'default_avatar_url' : 'default_avatar_url'} alt="Avatar" />
               </IonAvatar>
-
               <IonLabel
                 style={{
                   marginLeft: userId === message.senderId ? '0' : '10px',
                   marginRight: userId === message.senderId ? '10px' : '0',
                   padding: '10px',
                   borderRadius: '10px',
-                  background: message.senderId === userId ? 'lightblue' : 'lightgreen'
+                  background: message.senderId === userId ? '#1F8AFF' : 'rgb(42 45 47)',
+                  color:'white'
                 }}
               >
                 {message.content}

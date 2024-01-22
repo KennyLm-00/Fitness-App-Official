@@ -63,8 +63,10 @@ const Tab3: React.FC = () => {
           const userPostsData = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             imageUrl: doc.data().imageUrl,
-            likedBy: doc.data().likedBy, // Include likedBy property
-            likes: doc.data().likes, // Include likes property
+            likedBy: doc.data().likedBy,
+            likes: doc.data().likes,
+            caption: doc.data().caption, // Include caption property
+            category: doc.data().category, // Include category property
             // Add other necessary fields from your Firestore document
           }));
 
@@ -244,22 +246,22 @@ const Tab3: React.FC = () => {
                   </IonCol>
                   <IonCol size="6" style={{ marginTop: '30px', }}>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
-                      <IonIcon icon={person} style={{ fontSize: '1.5rem', verticalAlign: 'middle' }} />
+                      <IonIcon icon={person} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       {username ? `${username}` : 'Loading user...'}
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
-                      <IonIcon icon={barbell} style={{ fontSize: '1.5rem', verticalAlign: 'middle' }} />
+                      <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Lift Category
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
-                      <IonIcon icon={location} style={{ fontSize: '1.2rem', verticalAlign: 'middle',color: '#ffb057' }} />
+                      <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Idaho
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
-                      <IonIcon icon={personAdd} style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+                      <IonIcon icon={personAdd} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Add
                     </IonCardSubtitle>
@@ -353,13 +355,12 @@ const Tab3: React.FC = () => {
                       <DetailedView
                         post={selectedPost}
                         username={username}
+                        userImageUrl={updatedImageUrl || auth.currentUser?.photoURL || ''}
                         onClose={closeDetailedView}
                         onLike={(postId) => handleLike(postId, username)}
                       />
                     </IonModal>
                   )}
-
-
                 </IonRow>
               </IonGrid>
             </IonCol>

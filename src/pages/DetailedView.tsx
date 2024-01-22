@@ -1,56 +1,55 @@
 import React from 'react';
-import { IonPage, IonContent, IonHeader, IonToolbar, IonButtons, IonButton, IonBackButton, IonTitle, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent, IonIcon } from '@ionic/react';
+import { IonPage, IonContent, IonCard, IonCardHeader, IonLabel, IonCardSubtitle, IonCardContent, IonIcon, IonChip, IonAvatar } from '@ionic/react';
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { CiShare1 } from "react-icons/ci";
-import { heart, heartOutline, arrowBack } from 'ionicons/icons';
-import './Tab1.css';
-import '../theme/variables.css';
+import { heart, heartOutline,barbellOutline, arrowBack } from 'ionicons/icons';
 
-/* Core CSS required for Ionic components to work properly */
-
-/* Theme variables */
-import '../theme/variables.css';
 const DetailedView: React.FC<{
-    post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] } | null;
-    username: string; // Add username prop
+    post: {
+        id: string;
+        imageUrl?: string | undefined;
+        likes: number;
+        likedBy: string[];
+        caption?: string; // Include caption property
+        category?: string; // Include category property
+    } | null;
+    username: string;
+    userImageUrl: string; // Add userImageUrl property
     onClose: () => void;
     onLike: (postId: string) => void;
-}> = ({ post, username, onClose, onLike }) => {
+}> = ({ post, username, userImageUrl, onClose, onLike }) => {
     if (!post) {
         return null;
     }
 
     const handleBackButtonClick = () => {
-        // Handle back button click logic here
         onClose();
     };
+
     return (
         <IonPage>
-            {/* <IonHeader translucent={false} style={{backgroundColor:'#1b221f'}}>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                        <IonButton onClick={handleBackButtonClick}>
-                            <IonIcon slot="icon-only" icon={arrowBack} />
-                        </IonButton>
-                    </IonButtons>
-                    <IonTitle>Detailed View</IonTitle>
-                </IonToolbar>
-            </IonHeader> */}
             <IonContent style={{ margin: 'auto' }}>
-                <button onClick={handleBackButtonClick} style={{background:'transparent',fontSize:'2.5rem'}}>
+                <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.5rem' }}>
                     <IonIcon slot="icon-only" icon={arrowBack} />
                 </button>
-                <IonCard style={{ margin: 'auto'}}>
-
-                    <IonCardHeader>
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                            Post title
-                        </IonCardSubtitle>
-                    </IonCardHeader>
+                <IonCard style={{ margin: 'auto' }}>
+                    <IonChip>
+                        <IonAvatar>
+                            <img src={userImageUrl} alt="User Profile" />
+                        </IonAvatar>
+                        <IonLabel style={{ fontWeight: 'bold' }}>
+                            {username}
+                        </IonLabel>
+                    </IonChip>
+                    <IonChip style={{ background: '#ffb057' }}>
+                      <IonIcon style={{ color: 'white' }} icon={barbellOutline} />
+                      <IonLabel style={{ fontWeight: 'bold' }}>
+                        {post.category}
+                      </IonLabel>
+                    </IonChip>
+                    <IonCardContent style={{ color: 'white' }}>{post.caption}</IonCardContent>
                     <IonCardContent>
-                        {post.imageUrl && (
-                            <img src={post.imageUrl} alt={`Detailed View`} style={{ width: '100%', borderRadius: '8px' }} />
-                        )}
+                        {post.imageUrl && <img src={post.imageUrl} alt={`Detailed View`} style={{ width: '100%', borderRadius: '8px' }} />}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <IonIcon
@@ -73,4 +72,3 @@ const DetailedView: React.FC<{
 };
 
 export default DetailedView;
-
