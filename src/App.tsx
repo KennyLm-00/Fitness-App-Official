@@ -18,6 +18,7 @@ import { GoHomeFill } from "react-icons/go";
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
+import Notifications from './pages/Notifications';
 import Powerlifting from './category/powerlifting';
 import Bodybuilding from './category/bodybuilding';
 import Crossfit from './category/crossfit';
@@ -90,6 +91,9 @@ const App: React.FC = () => (
           </Route>
           <Route path="/Message">
             <Message />
+          </Route>
+          <Route path="/notifications">
+            <Notifications />
           </Route>
           <Route exact path="/">
             <Redirect to="/tab1" />

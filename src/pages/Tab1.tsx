@@ -17,20 +17,22 @@ import {
   IonImg,
   IonCardSubtitle,
   IonText,
+  IonRouterLink,
   IonChip,
   IonAvatar,
   IonLabel,
   IonIcon,
   IonNote
 } from '@ionic/react';
-import { logOutOutline, heartOutline, heart, barbellOutline } from 'ionicons/icons';
+import { logOutOutline, heartOutline, heart, barbellOutline, notificationsOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
 import { FaRegCommentDots } from "react-icons/fa6";
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-
+import { FaBell } from "react-icons/fa";
 import { GoHeart } from "react-icons/go";
+import { notifications } from 'ionicons/icons'
 import { getDocs, collection, updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -185,7 +187,7 @@ const Tab1: React.FC = () => {
     <IonPage>
       <IonContent className='home' fullscreen>
         <IonHeader translucent={false}>
-          <IonToolbar >
+          <IonToolbar>
             <IonButtons slot="start">
               {userImageUrl && (
                 <img
@@ -196,17 +198,20 @@ const Tab1: React.FC = () => {
                 />
               )}
             </IonButtons>
-            <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin:'auto' }}>{userName ? `${userName}` : 'Loading user...'}</IonCardSubtitle>
+            <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>
+              {userName ? `${userName}` : 'Loading user...'}
+            </IonCardSubtitle>
             <IonButtons slot="end">
-              <IonButton href="/" onClick={handleLogout}>
-                <IonIcon style={{ color: 'white' }} icon={logOutOutline}></IonIcon>
-              </IonButton>
+              {/* Use IonRouterLink for clean navigation */}
+              <IonRouterLink routerLink="/notifications" routerDirection="forward" style={{ textDecoration: 'none', color: 'white' }}>
+                <IonIcon icon={notificationsOutline} style={{ fontSize: '27px',marginRight:'5px' }} />
+              </IonRouterLink>
             </IonButtons>
           </IonToolbar>
         </IonHeader>
         <div className='container' style={{ maxWidth: '1200px', margin: 'auto' }}>
           <IonGrid>
-              <IonCardTitle style={{ fontSize: '1rem', padding:'0.8rem',color:'white' }}>Categories</IonCardTitle>
+            <IonCardTitle style={{ fontSize: '1rem', padding: '0.8rem', color: 'white' }}>Categories</IonCardTitle>
             <Swiper
               style={{ background: 'transparent', borderColor: 'transparent' }}
               spaceBetween={1}
@@ -251,7 +256,7 @@ const Tab1: React.FC = () => {
                       <IonLabel style={{ fontWeight: 'bold' }}>{post.username}</IonLabel>
                     </IonChip>
                     {/* <br></br> */}
-                    <IonText style={{ padding: '1rem', color: 'lightgrey',float:'right' }}>
+                    <IonText style={{ padding: '1rem', color: 'lightgrey', float: 'right' }}>
                       {post.timestamp && new Date(post.timestamp.toDate()).toLocaleString('en-US', {
                         month: 'numeric',
                         day: 'numeric',
@@ -277,23 +282,23 @@ const Tab1: React.FC = () => {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <IonCol size="2" size-sm="4" style={{zIndex:'100'}}>
-                            <IonIcon
-                              icon={post.likedBy.includes(userName) ? heart : heartOutline}
-                              style={{ fontSize: '24px', color: post.likedBy.includes(userName) ? 'red' : 'white' }}
-                              onClick={() => handleLike(post.id, userName)}
-                            />
-                          </IonCol>
+                        <IonCol size="2" size-sm="4" style={{ zIndex: '100' }}>
+                          <IonIcon
+                            icon={post.likedBy.includes(userName) ? heart : heartOutline}
+                            style={{ fontSize: '24px', color: post.likedBy.includes(userName) ? 'red' : 'white' }}
+                            onClick={() => handleLike(post.id, userName)}
+                          />
+                        </IonCol>
                         <IonCol size="8" size-sm="4" style={{ color: 'white' }}>
                           <IonCardContent>{post.likes}</IonCardContent>
                         </IonCol>
                       </div>
                       <div>
                         <IonCol size="12" size-sm="4">
-                          <HiOutlineChatBubbleBottomCenterText  style={{ fontSize: '24px', color: 'white', fontWeight:'100' }} />
+                          <HiOutlineChatBubbleBottomCenterText style={{ fontSize: '24px', color: 'white', fontWeight: '100' }} />
                         </IonCol>
                         <IonCol size="12" size-sm="4">
-                          <CiShare1  style={{ fontSize: '24px', color: 'white' }} />
+                          <CiShare1 style={{ fontSize: '24px', color: 'white' }} />
                         </IonCol>
                       </div>
                     </div>
