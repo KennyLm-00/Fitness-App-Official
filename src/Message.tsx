@@ -35,7 +35,7 @@ import { getDocs, collection, addDoc, onSnapshot, query, where, orderBy } from '
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
-import { arrowUpCircle, addCircle, images, imageOutline, search } from 'ionicons/icons';
+import { arrowUpCircle, addCircle, images, imageOutline,camera, search } from 'ionicons/icons';
 
 interface User {
   id: string;
@@ -216,7 +216,7 @@ const Message: React.FC = () => {
           ))}
         </div>
 
-        <div style={{ position: 'fixed', bottom: 60, width: '100%', padding: '10px', borderTop: '1px solid #ccc', display: 'flex', zIndex: 2 }}>
+        <div style={{ position: 'fixed', bottom: 0, width: '100%', padding: '10px', borderTop: '1px solid #ccc', display: 'flex', zIndex: 2 }}>
           <IonFab slot="fixed" vertical="bottom" horizontal="start"
             style={{ padding: '0', background: 'transparent' }}>
             <IonFabButton>
@@ -227,10 +227,10 @@ const Message: React.FC = () => {
                 <IonIcon icon={imageOutline} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
               </IonFabButton>
               <IonFabButton>
-                <IonIcon icon={addCircle} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
+                <IonIcon icon={camera} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
               </IonFabButton>
               <IonFabButton>
-                <IonIcon icon={addCircle} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
+                <IonIcon icon={search} style={{ background: 'transparent', fontSize: '2.3rem', color: 'white' }}></IonIcon>
               </IonFabButton>
             </IonFabList>
           </IonFab>

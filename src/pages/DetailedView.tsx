@@ -1,8 +1,29 @@
-import React from 'react';
-import { IonPage, IonContent, IonCard, IonCardHeader, IonLabel, IonCardSubtitle, IonCardContent, IonIcon, IonChip, IonAvatar } from '@ionic/react';
-import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
+import React, { useState, useRef, useEffect } from 'react';
+import {
+    IonContent,
+    IonHeader,
+    IonCol,
+    IonCard,
+    IonGrid,
+    IonRow,
+    IonPage,
+    IonInput,
+    IonCardTitle,
+    IonCardHeader,
+    IonToolbar,
+    IonButtons,
+    IonButton,
+    IonText,
+    IonCardContent,
+    IonIcon,
+    IonAvatar,
+    IonModal,
+    IonCardSubtitle,
+    IonChip,
+    IonLabel
+} from '@ionic/react'; import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { CiShare1 } from "react-icons/ci";
-import { heart, heartOutline,barbellOutline, arrowBack } from 'ionicons/icons';
+import { heart, heartOutline, barbellOutline, arrowBack } from 'ionicons/icons';
 
 const DetailedView: React.FC<{
     post: {
@@ -29,9 +50,13 @@ const DetailedView: React.FC<{
     return (
         <IonPage>
             <IonContent style={{ margin: 'auto' }}>
-                <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.5rem' }}>
-                    <IonIcon slot="icon-only" icon={arrowBack} />
-                </button>
+                <IonHeader translucent={false}>
+                    <IonToolbar>
+                        <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.5rem' }}>
+                            <IonIcon slot="icon-only" icon={arrowBack} style={{color:'white'}} />
+                        </button>
+                    </IonToolbar>
+                </IonHeader>
                 <IonCard style={{ margin: 'auto' }}>
                     <IonChip>
                         <IonAvatar>
@@ -42,10 +67,10 @@ const DetailedView: React.FC<{
                         </IonLabel>
                     </IonChip>
                     <IonChip style={{ background: '#ffb057' }}>
-                      <IonIcon style={{ color: 'white' }} icon={barbellOutline} />
-                      <IonLabel style={{ fontWeight: 'bold' }}>
-                        {post.category}
-                      </IonLabel>
+                        <IonIcon style={{ color: 'white' }} icon={barbellOutline} />
+                        <IonLabel style={{ fontWeight: 'bold' }}>
+                            {post.category}
+                        </IonLabel>
                     </IonChip>
                     <IonCardContent style={{ color: 'white' }}>{post.caption}</IonCardContent>
                     <IonCardContent>

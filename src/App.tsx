@@ -10,14 +10,19 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, logoGoogle, square, triangle, homeOutline,person, barbellOutline, settings, addOutline, addCircleOutline, settingsOutline, chatbubble } from 'ionicons/icons';
+import { ellipse, logoGoogle, square, triangle, homeOutline, person, barbellOutline, settings, addOutline, addCircleOutline, settingsOutline,add, chatbubble } from 'ionicons/icons';
 // import Google from './pages/Google';
 import { FaHome, FaPlusCircle, FaCog } from 'react-icons/fa';
 import { GoHomeFill } from "react-icons/go";
+import { CiSearch } from "react-icons/ci";
+import { IoAddCircle } from "react-icons/io5";
 
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
+import Search from './pages/Search';
+import UserProfiles from './pages/UserProfiles';
+
 import Notifications from './pages/Notifications';
 import Powerlifting from './category/powerlifting';
 import Bodybuilding from './category/bodybuilding';
@@ -68,8 +73,14 @@ const App: React.FC = () => (
           {/* <Route exact path="/Google">
             <Google />
           </Route> */}
+          <Route path="/user/:username" component={UserProfiles} />
+          {/* <UserProfiles />
+        </Route> */}
           <Route exact path="/tab1">
             <Tab1 />
+          </Route>
+          <Route path="/search">
+            <Search />
           </Route>
           <Route exact path="/tab2">
             <Tab2 />
@@ -104,23 +115,27 @@ const App: React.FC = () => (
             <GoHomeFill size={iconSize} />
             {/* <span>Home</span> */}
           </IonTabButton>
+          <IonTabButton tab="search" href="/search">
+            <CiSearch size={iconSize} />
+            {/* <span>Home</span> */}
+          </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2">
-            <FaPlusCircle size={iconSize} />
+            <IoAddCircle size={45} />
             {/* <span>Create</span> */}
           </IonTabButton>
           <IonTabButton tab="Message" href="/Message">
-            <IonIcon icon={chatbubble} style={{fontSize:'1.5rem'}}></IonIcon>
+            <IonIcon icon={chatbubble} style={{ fontSize: '1.5rem' }}></IonIcon>
             {/* <span>Settings</span> */}
           </IonTabButton>
           <IonTabButton tab="tab3" href="/tab3">
             {/* <FaCog size={iconSize} /> */}
-            <IonIcon icon={person} style={{fontSize:'1.5rem'}}></IonIcon>
+            <IonIcon icon={person} style={{ fontSize: '1.5rem' }}></IonIcon>
             {/* <span>Settings</span> */}
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>
-  </IonApp>
+  </IonApp >
 );
 
 export default App;

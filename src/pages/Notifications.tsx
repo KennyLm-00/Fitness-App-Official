@@ -2,6 +2,7 @@ import React from 'react';
 import { IonPage, IonContent, IonIcon,IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonLabel } from '@ionic/react';
 import { arrowBack } from 'ionicons/icons'
 import { useHistory } from 'react-router-dom';
+import './Tab3.css';
 
 const Notifications: React.FC = () => {
   const history = useHistory();
@@ -13,7 +14,7 @@ const Notifications: React.FC = () => {
     <IonPage>
       <IonContent>
         <IonHeader>
-          <IonToolbar>
+          <IonToolbar style={{backgroundColor:'red !important'}}>
             <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.5rem' }}>
               <IonIcon slot="icon-only" icon={arrowBack} />
             </button>

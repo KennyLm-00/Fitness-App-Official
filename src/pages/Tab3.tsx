@@ -22,7 +22,7 @@ import {
 } from '@ionic/react';
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { getDocs, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
+import { getDocs, addDoc, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
@@ -245,22 +245,22 @@ const Tab3: React.FC = () => {
                     )}
                   </IonCol>
                   <IonCol size="6" style={{ marginTop: '30px', }}>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={person} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       {username ? `${username}` : 'Loading user...'}
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Lift Category
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Idaho
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '1rem' }}>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={personAdd} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Add
