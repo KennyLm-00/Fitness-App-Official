@@ -22,6 +22,7 @@ import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
 import Search from './pages/Search';
 import UserProfiles from './pages/UserProfiles';
+import { RiSearch2Fill } from "react-icons/ri";
 
 import Notifications from './pages/Notifications';
 import Powerlifting from './category/powerlifting';
@@ -116,7 +117,7 @@ const App: React.FC = () => (
             {/* <span>Home</span> */}
           </IonTabButton>
           <IonTabButton tab="search" href="/search">
-            <CiSearch size={iconSize} />
+            <RiSearch2Fill size={iconSize} />
             {/* <span>Home</span> */}
           </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2">
