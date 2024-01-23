@@ -157,7 +157,7 @@ const UserProfiles: React.FC = () => {
           </IonGrid>
         </IonCol>
         <IonCol size="12">
-              <IonCard style={{borderRadius:'0px'}}>
+              <IonCard style={{width:'94%'}}>
                 {/* <IonCardHeader>
                   <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
                 </IonCardHeader> */}
