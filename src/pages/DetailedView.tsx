@@ -24,6 +24,7 @@ import {
 } from '@ionic/react'; import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { CiShare1 } from "react-icons/ci";
 import { heart, heartOutline, barbellOutline, arrowBack } from 'ionicons/icons';
+import './DetailedView.css';
 
 const DetailedView: React.FC<{
     post: {

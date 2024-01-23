@@ -1,0 +1,16 @@
+ion-toolbar {
+    --background: rgba(51, 84, 85, 0) !important;
+    --border-color: transparent;
+    font-family: "Montserrat Alternates", sans-serif;
+    /* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; */
+    padding: 0rem;
+    /* padding-bottom: 1rem; */
+    box-shadow: none;
+    border:none;
+    /* border-bottom: 1px solid white; */
+    padding-bottom: 0.2rem;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    box-shadow: none !important;
+    /* box-shadow: rgba(81, 81, 92, 0.2) 0px 7px 29px 0px; */
+  }
