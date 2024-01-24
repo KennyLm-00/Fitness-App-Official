@@ -334,7 +334,7 @@ const Tab1: React.FC = () => {
                       </>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
                         <IonCol size="2" size-sm="4" style={{ zIndex: '100' }}>
                           <IonIcon
                             icon={post.likedBy.includes(userName) ? heart : heartOutline}
@@ -348,27 +348,28 @@ const Tab1: React.FC = () => {
                       </div>
                       <div>
                         {/* Icon to toggle comments visibility */}
-                        
+
                         <IonCol size="12" size-sm="4" style={{ zIndex: '100' }}>
-                      <HiOutlineChatBubbleBottomCenterText
-                        style={{ fontSize: '24px', color: 'white', fontWeight: '100', cursor: 'pointer' }}
-                        onClick={() => setShowComments(!showComments)}
-                      />
-                    </IonCol>
-                    {/* Likes count */}
-                    <IonCol size="12" size-sm="4">
-                      <CiShare1 style={{ fontSize: '24px', color: 'white' }} />
-                    </IonCol>
+                          <HiOutlineChatBubbleBottomCenterText
+                            style={{ fontSize: '24px', color: 'white', fontWeight: '100', cursor: 'pointer' }}
+                            onClick={() => setShowComments(!showComments)}
+                          />
+                        </IonCol>
+                        {/* Likes count */}
+                        <IonCol size="12" size-sm="4">
+                          <CiShare1 style={{ fontSize: '24px', color: 'white' }} />
+                        </IonCol>
                       </div>
                     </div>
 
                     {/* Display comments only if showComments is true */}
                     {showComments && (
-                  <PostComments
-                    comments={post.comments || []}
-                    onAddComment={(commentText) => handleAddComment(post.id, commentText)}
-                  />
-                )}
+                      <PostComments
+                        comments={post.comments || []}
+                        onAddComment={(commentText) => handleAddComment(post.id, commentText)}
+                        onCloseComments={() => setShowComments(false)}
+                      />
+                    )}
                   </IonCard>
                 </IonCol>
               ))}
