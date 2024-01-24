@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '../firebase/firebaseConfig';
 import { search } from 'ionicons/icons';
-import './Search.css';
 
 interface User {
     id: string;
@@ -48,27 +47,25 @@ const Search: React.FC = () => {
             <IonContent>
                 <IonHeader translucent={false}>
                     <br></br>
-                    <IonToolbar>
-                        <IonSearchbar
-                            style={{ color: 'white',background:'#1b221f' }}
-                            value={searchQuery}
-                            onIonChange={(e) => setSearchQuery(e.detail.value!)}
-                            onIonClear={() => setSearchResults([])}
-                            onIonCancel={() => setSearchResults([])}
-                            placeholder="Search for users"
-                            debounce={500}
-                            animated
-                            enterkeyhint="search"
-                            onIonInput={(e) => {
-                                setSearchQuery(e.detail.value!);
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSearch();
-                                }
-                            }}
-                        />
-                    </IonToolbar>
+                    <IonSearchbar
+                        style={{ color: 'white', background: '#1b221f' }}
+                        value={searchQuery}
+                        onIonChange={(e) => setSearchQuery(e.detail.value!)}
+                        onIonClear={() => setSearchResults([])}
+                        onIonCancel={() => setSearchResults([])}
+                        placeholder="Search for users"
+                        debounce={500}
+                        animated
+                        enterkeyhint="search"
+                        onIonInput={(e) => {
+                            setSearchQuery(e.detail.value!);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                    />
                 </IonHeader>
                 <IonList>
                     {searchResults.map((user) => (

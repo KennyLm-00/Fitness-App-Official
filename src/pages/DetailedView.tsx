@@ -23,8 +23,7 @@ import {
     IonLabel
 } from '@ionic/react'; import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { CiShare1 } from "react-icons/ci";
-import { heart, heartOutline, barbellOutline, arrowBack } from 'ionicons/icons';
-import './DetailedView.css';
+import { heart, heartOutline, barbellOutline, arrowBack, ellipsisHorizontal } from 'ionicons/icons';
 
 const DetailedView: React.FC<{
     post: {
@@ -52,10 +51,9 @@ const DetailedView: React.FC<{
         <IonPage>
             <IonContent style={{ margin: 'auto' }}>
                 <IonHeader translucent={false}>
-                    <IonToolbar>
-                        <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.5rem' }}>
-                            <IonIcon slot="icon-only" icon={arrowBack} style={{color:'white'}} />
-                        </button>
+                    <IonToolbar className="ion-toolbar-custom" style={{ boxShadow: 'none', padding: '0', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>                          <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2rem' }}>
+                        <IonIcon slot="icon-only" icon={arrowBack} style={{ color: 'white' }} />
+                    </button>
                     </IonToolbar>
                 </IonHeader>
                 <IonCard style={{ margin: 'auto' }}>

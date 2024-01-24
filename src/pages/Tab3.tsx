@@ -18,16 +18,17 @@ import {
   IonIcon,
   IonAvatar,
   IonModal,
-  IonCardSubtitle
+  IonCardSubtitle,
+  IonAlert
 } from '@ionic/react';
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { getDocs, addDoc, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
+import { getDocs, addDoc, deleteDoc ,collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal } from 'ionicons/icons';
 import DetailedView from './DetailedView'; // Import DetailedView
 
 const Tab3: React.FC = () => {
@@ -36,6 +37,7 @@ const Tab3: React.FC = () => {
   const [updatedImageUrl, setUpdatedImageUrl] = useState<string | null>(null); // New state to manage updated image URL
   const username = auth.currentUser?.displayName || ''; // Get the username
   const [posts, setPosts] = useState<{ id: string; imageUrl?: string; likedBy: string[]; likes: number }[]>([]);
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const history = useHistory();
   const [userImageUrl, setUserImageUrl] = useState<string>('');
   // const [selectedPost, setSelectedPost] = useState<{ id: string; imageUrl?: string | undefined } | null>(null);
@@ -88,19 +90,6 @@ const Tab3: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const selectedImage = event.target.files[0];
-      setImageFile(selectedImage);
-      setImagePreview(URL.createObjectURL(selectedImage));
-    }
-  };
-
-  const handleDeleteImage = () => {
-    setImageFile(null);
-    setImagePreview(auth.currentUser?.photoURL || null);
-  };
-
   const handleUpdateProfilePicture = async () => {
     try {
       if (!auth.currentUser) {
@@ -145,6 +134,42 @@ const Tab3: React.FC = () => {
     } catch (error) {
       console.error('Error during logout:', error);
     }
+  };
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const selectedImage = event.target.files[0];
+      setImageFile(selectedImage);
+      setImagePreview(URL.createObjectURL(selectedImage));
+    }
+  };
+  const handleDeletePost = (postId: string) => {
+    setDeletePostId(postId);
+  };
+  const handlePostDelete = async (postId: string | null) => {
+    try {
+      if (postId === null) {
+        console.log('No post selected for deletion.');
+        return;
+      }
+  
+      // Assuming "posts" is your Firestore collection
+      const postRef = doc(firestore, 'posts', postId);
+  
+      // Delete the post from Firestore
+      await deleteDoc(postRef);
+  
+      // After successful deletion, you might want to update the state
+      setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
+  
+      console.log(`Post with ID ${postId} deleted successfully.`);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+  
+  const handleDeleteImage = () => {
+    setImageFile(null);
+    setImagePreview(auth.currentUser?.photoURL || null);
   };
   const [liked, setLiked] = useState(false);
 
@@ -335,6 +360,33 @@ const Tab3: React.FC = () => {
                 <IonRow style={{ padding: '0px' }}>
                   {posts.map((post) => (
                     <IonCol key={post.id} size="6" size-md="4" style={{ padding: '1px' }}>
+                      <IonIcon
+                        style={{ float: 'right', fontSize: '1.5rem', color: 'white' }}
+                        icon={ellipsisHorizontal}
+                        onClick={() => handleDeletePost(post.id)}
+                      />
+                      <IonAlert
+                        isOpen={deletePostId !== null}
+                        header="Delete Post"
+                        message="Are you sure you want to delete this post?"
+                        buttons={[
+                          {
+                            text: 'Cancel',
+                            role: 'cancel',
+                            handler: () => {
+                              setDeletePostId(null);
+                            },
+                          },
+                          {
+                            text: 'Delete',
+                            handler: () => {
+                              // Call a function to handle the actual post deletion
+                              handlePostDelete(deletePostId);
+                              setDeletePostId(null);
+                            },
+                          },
+                        ]}
+                      />
                       <IonCard onClick={() => handlePostClick(post)} style={{ borderRadius: '0px' }}>
                         {/* <IonCardHeader>
                           <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
