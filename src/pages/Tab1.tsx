@@ -55,6 +55,7 @@ const Tab1: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]); // Update the type as needed
   const [commentText, setCommentText] = useState<string>(''); // Add this line to declare state for comment text
   const [showComments, setShowComments] = useState(false);
+  const [showCommentsForPostId, setShowCommentsForPostId] = useState<string | null>(null);
 
   const history = useHistory();
 
@@ -233,6 +234,10 @@ const Tab1: React.FC = () => {
       console.error('Could not like/unlike post: ', error);
     }
   };
+  const handleToggleComments = (postId: string) => {
+    // Toggle comments only for the clicked post
+    setShowCommentsForPostId((prevId) => (prevId === postId ? null : postId));
+  };
 
   const iconColor = liked ? 'white' : 'red';
 
@@ -352,7 +357,7 @@ const Tab1: React.FC = () => {
                         <IonCol size="12" size-sm="4" style={{ zIndex: '100' }}>
                           <HiOutlineChatBubbleBottomCenterText
                             style={{ fontSize: '24px', color: 'white', fontWeight: '100', cursor: 'pointer' }}
-                            onClick={() => setShowComments(!showComments)}
+                            onClick={() => handleToggleComments(post.id)}
                           />
                         </IonCol>
                         {/* Likes count */}
@@ -363,11 +368,11 @@ const Tab1: React.FC = () => {
                     </div>
 
                     {/* Display comments only if showComments is true */}
-                    {showComments && (
+                    {showCommentsForPostId === post.id && (
                       <PostComments
                         comments={post.comments || []}
                         onAddComment={(commentText) => handleAddComment(post.id, commentText)}
-                        onCloseComments={() => setShowComments(false)}
+                        onCloseComments={() => setShowCommentsForPostId(null)}
                       />
                     )}
                   </IonCard>
