@@ -21,6 +21,7 @@ import {
   IonChip,
   IonAvatar,
   IonLabel,
+  IonInput,
   IonIcon,
   IonNote
 } from '@ionic/react';
@@ -50,7 +51,17 @@ const Tab1: React.FC = () => {
   const [userName, setUserName] = useState<string>('');
   const [userImageUrl, setUserImageUrl] = useState<string>('');
   const [posts, setPosts] = useState<any[]>([]); // Update the type as needed
+  const [commentText, setCommentText] = useState<string>(''); // Add this line to declare state for comment text
+
   const history = useHistory();
+
+  interface Comment {
+    text: string;
+    timestamp: Date;
+    user: string;
+    // ...other comment-related fields
+  }
+
   const data = [
     {
       title: "Bodybuilding",
@@ -105,6 +116,45 @@ const Tab1: React.FC = () => {
 
     fetchPosts();
   }, []);
+  const handleAddComment = async (postId: string, commentText: string) => {
+    try {
+      const user = auth.currentUser;
+
+      if (user) {
+        const comment = {
+          text: commentText,
+          timestamp: new Date(),
+          user: user.displayName || user.email || '',
+          // ...other comment-related fields
+        };
+
+        // Update the state
+        setPosts((prevPosts) => {
+          return prevPosts.map((prevPost) => {
+            if (prevPost.id === postId) {
+              return {
+                ...prevPost,
+                comments: [...(prevPost.comments || []), comment],
+              };
+            }
+            return prevPost;
+          });
+        });
+
+        // Update Firestore
+        const postRef = doc(firestore, 'posts', postId);
+        await updateDoc(postRef, {
+          comments: arrayUnion(comment),
+        });
+
+        // Clear the comment text after adding
+        setCommentText('');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
 
   const handleLogout = async () => {
     try {
@@ -204,7 +254,7 @@ const Tab1: React.FC = () => {
             <IonButtons slot="end">
               {/* Use IonRouterLink for clean navigation */}
               <IonRouterLink routerLink="/notifications" routerDirection="forward" style={{ textDecoration: 'none', color: 'white' }}>
-                <IonIcon icon={notificationsOutline} style={{ fontSize: '27px',marginRight:'5px' }} />
+                <IonIcon icon={notificationsOutline} style={{ fontSize: '27px', marginRight: '5px' }} />
               </IonRouterLink>
             </IonButtons>
           </IonToolbar>
@@ -302,7 +352,26 @@ const Tab1: React.FC = () => {
                         </IonCol>
                       </div>
                     </div>
+                    <IonCardContent>
+                      {/* ... other post details */}
+                      {/* Display existing comments */}
+                      {post.comments?.map((comment: any) => (
+                        <div key={comment.timestamp}>
+                          <strong>{comment.user}:</strong> {comment.text}
+                        </div>
+                      ))}
 
+                      {/* Add Comment Section */}
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Add a comment..."
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                        />
+                        <button onClick={() => handleAddComment(post.id, commentText)}>Add Comment</button>
+                      </div>
+                    </IonCardContent>
                   </IonCard>
                 </IonCol>
               ))}
