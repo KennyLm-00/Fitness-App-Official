@@ -50,7 +50,7 @@ const Search: React.FC = () => {
                     <br></br>
                     <IonToolbar>
                         <IonSearchbar
-                            style={{ color: 'white' }}
+                            style={{ color: 'white',background:'#1b221f' }}
                             value={searchQuery}
                             onIonChange={(e) => setSearchQuery(e.detail.value!)}
                             onIonClear={() => setSearchResults([])}

@@ -178,7 +178,7 @@ const UserProfiles: React.FC = () => {
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
                           500
                           <br />
-                          Friends
+                          Gym Pals
                         </IonCardSubtitle>
                       </IonCol>
 

@@ -373,3 +373,7 @@ ion-fab{
   left: 0;
   box-shadow:none !important;
 }
+ion-searchbar{
+  --background: #21302a !important;
+  /* border-bottom: 1px solid white; */
+  }
