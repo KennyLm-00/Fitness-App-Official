@@ -25,7 +25,7 @@ import {
   IonIcon,
   IonNote
 } from '@ionic/react';
-import { logOutOutline, heartOutline, heart, barbellOutline, notificationsOutline } from 'ionicons/icons';
+import { logOutOutline, heartOutline, heart, barbellOutline, notificationsOutline, send } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
 import { FaRegCommentDots } from "react-icons/fa6";
@@ -52,6 +52,7 @@ const Tab1: React.FC = () => {
   const [userImageUrl, setUserImageUrl] = useState<string>('');
   const [posts, setPosts] = useState<any[]>([]); // Update the type as needed
   const [commentText, setCommentText] = useState<string>(''); // Add this line to declare state for comment text
+  const [showComments, setShowComments] = useState(false);
 
   const history = useHistory();
 
@@ -331,7 +332,7 @@ const Tab1: React.FC = () => {
                       </>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                         <IonCol size="2" size-sm="4" style={{ zIndex: '100' }}>
                           <IonIcon
                             icon={post.likedBy.includes(userName) ? heart : heartOutline}
@@ -344,34 +345,46 @@ const Tab1: React.FC = () => {
                         </IonCol>
                       </div>
                       <div>
-                        <IonCol size="12" size-sm="4">
-                          <HiOutlineChatBubbleBottomCenterText style={{ fontSize: '24px', color: 'white', fontWeight: '100' }} />
+                        {/* Icon to toggle comments visibility */}
+                        
+                        <IonCol size="12" size-sm="4" style={{ zIndex: '100' }}>
+                          <HiOutlineChatBubbleBottomCenterText
+                            style={{ fontSize: '24px', color: 'white', fontWeight: '100', cursor: 'pointer' }}
+                            onClick={() => setShowComments(!showComments)}
+                          />
                         </IonCol>
+                        {/* Likes count */}
                         <IonCol size="12" size-sm="4">
                           <CiShare1 style={{ fontSize: '24px', color: 'white' }} />
                         </IonCol>
                       </div>
                     </div>
-                    <IonCardContent>
-                      {/* ... other post details */}
-                      {/* Display existing comments */}
-                      {post.comments?.map((comment: any) => (
-                        <div key={comment.timestamp}>
-                          <strong>{comment.user}:</strong> {comment.text}
-                        </div>
-                      ))}
 
-                      {/* Add Comment Section */}
-                      <div>
-                        <input
-                          type="text"
-                          placeholder="Add a comment..."
-                          value={commentText}
-                          onChange={(e) => setCommentText(e.target.value)}
-                        />
-                        <button onClick={() => handleAddComment(post.id, commentText)}>Add Comment</button>
-                      </div>
-                    </IonCardContent>
+                    {/* Display comments only if showComments is true */}
+                    {showComments && (
+                      <IonCardContent style={{paddingTop:'0px'}}>
+                        {/* ... other post details */}
+                        {/* Display existing comments */}
+                        {post.comments?.map((comment: any) => (
+                          <div key={comment.timestamp} style={{ padding:'.5rem'}}>
+                            <strong style={{width:'90%',borderRadius:'10px',color:'white'}}>{comment.user}:</strong>
+                            <IonText style={{color:'white'}}> {comment.text} </IonText>
+                          </div>
+                        ))}
+
+                        {/* Add Comment Section */}
+                        <div>
+                          <input
+                          style={{width:'90%',borderRadius:'10px',color:'white'}}
+                            type="text"
+                            placeholder="Add a comment..."
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                          />
+                          <IonIcon icon = {send} style={{color:'white',float:'right',fontSize:'1.5rem'}} onClick={() => handleAddComment(post.id, commentText)} />
+                        </div>
+                      </IonCardContent>
+                    )}
                   </IonCard>
                 </IonCol>
               ))}
