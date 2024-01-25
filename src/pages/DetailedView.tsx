@@ -45,15 +45,17 @@ const DetailedView: React.FC<{
 
     const handleBackButtonClick = () => {
         onClose();
+        window.location.reload(); // Refresh the page
     };
 
     return (
         <IonPage>
             <IonContent style={{ margin: 'auto' }}>
                 <IonHeader translucent={false}>
-                    <IonToolbar className="ion-toolbar-custom" style={{ boxShadow: 'none', padding: '0', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>                          <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2rem' }}>
-                        <IonIcon slot="icon-only" icon={arrowBack} style={{ color: 'white' }} />
-                    </button>
+                    <IonToolbar className="ion-toolbar-custom" style={{ boxShadow: 'none', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>
+                        <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2rem' }}>
+                            <IonIcon slot="icon-only" icon={arrowBack} style={{ color: 'white' }} />
+                        </button>
                     </IonToolbar>
                 </IonHeader>
                 <IonCard style={{ margin: 'auto' }}>
