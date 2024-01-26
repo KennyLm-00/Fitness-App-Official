@@ -369,11 +369,14 @@ const Tab1: React.FC = () => {
 
                     {/* Display comments only if showComments is true */}
                     {showCommentsForPostId === post.id && (
-                      <PostComments
-                        comments={post.comments || []}
-                        onAddComment={(commentText) => handleAddComment(post.id, commentText)}
-                        onCloseComments={() => setShowCommentsForPostId(null)}
-                      />
+                     <PostComments
+                     comments={post.comments.map((comment: Comment) => ({
+                       ...comment,
+                       userImageUrl: comment.user === userName ? userImageUrl : post.userImageUrl,
+                     })) || []}
+                     onAddComment={(commentText) => handleAddComment(post.id, commentText)}
+                     onCloseComments={() => setShowCommentsForPostId(null)}
+                   />
                     )}
                   </IonCard>
                 </IonCol>
