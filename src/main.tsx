@@ -134,7 +134,7 @@ const Main: React.FC = () => {
               <IonRow style={{ background: '#1e1d24' }}>
                 <IonCol style={{ background: '#1e1d24', borderColor:'transparent' }} size="12" size-sm="12">
                   <img
-                    src={"../src/images/fitlogo.png"} // Replace with the actual image URL
+                    src={"../images/fitlogo.png"} // Replace with the actual image URL
                     alt="Image Alt Text"
                     style={{ height: '300px' }}
                   />

@@ -48,7 +48,7 @@ const Search: React.FC = () => {
                 <IonHeader translucent={false}>
                     <br></br>
                     <IonSearchbar
-                        style={{ color: 'white', background: '#1b221f' }}
+                        style={{ color: 'white', background: '#1b221f',paddingTop:'1.2rem' }}
                         value={searchQuery}
                         onIonChange={(e) => setSearchQuery(e.detail.value!)}
                         onIonClear={() => setSearchResults([])}
