@@ -60,18 +60,18 @@ const Main: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-    
+
       let userCredential;
-    
+
       if (isCreateNewUser) {
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
+
         const username = extractUsernameFromEmail(email);
         const userDocRef = doc(firestore, 'users', userCredential.user.uid);
-    
+
         // Assume imageUrl is the URL of the user's profile picture
         const imageUrl = 'https://example.com/default-profile-picture.jpg';
-    
+
         await setDoc(userDocRef, {
           username,
           email,
@@ -80,17 +80,17 @@ const Main: React.FC = () => {
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
-    
+
       // Check if the user is logged in
       const user = userCredential.user;
-    
+
       if (user) {
         // Set the default avatar URL if the user doesn't have a profile picture
         const defaultAvatarUrl = 'https://api.adorable.io/avatars/50/default.png';
-    
+
         // Set the user's profile picture to the default URL if it doesn't exist
         const photoURL = user.photoURL || defaultAvatarUrl;
-    
+
         // Update the user's profile picture in Firebase Authentication
         if (auth.currentUser) {
           await updateProfile(auth.currentUser, { photoURL });
@@ -99,7 +99,7 @@ const Main: React.FC = () => {
       }
     } catch (error) {
       const typedError = error as AuthError;
-    
+
       if (typedError.code === 'auth/user-not-found') {
         setError('User does not exist. Please sign up first.');
       } else if (typedError.code === 'auth/wrong-password') {
@@ -110,10 +110,10 @@ const Main: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    
   };
-  
-  
+
+
+
   return (
     <React.StrictMode>
       <IonApp>
@@ -132,7 +132,7 @@ const Main: React.FC = () => {
           >
             <IonGrid style={{ background: '#1e1d24' }}>
               <IonRow style={{ background: '#1e1d24' }}>
-                <IonCol style={{ background: '#1e1d24', borderColor:'transparent' }} size="12" size-sm="12">
+                <IonCol style={{ background: '#1e1d24', borderColor: 'transparent' }} size="12" size-sm="12">
                   <img
                     src={"../images/fitlogo.png"} // Replace with the actual image URL
                     alt="Image Alt Text"
@@ -141,7 +141,7 @@ const Main: React.FC = () => {
                   <p style={{ fontSize: '18px', color: 'lightskyblue', textAlign: 'center', marginTop: '10px' }}>
                     Welcome to Find-Fit! Please login or create a new account to continue.
                   </p>
-                  <IonCard style={{ background: '#1e1d24', boxShadow: 'none',borderColor:'transparent' }}>
+                  <IonCard style={{ background: '#1e1d24', boxShadow: 'none', borderColor: 'transparent' }}>
                     <IonCardHeader />
                     <input
                       type="email"
@@ -158,7 +158,7 @@ const Main: React.FC = () => {
                       style={{ padding: '10px', marginBottom: '20px' }}
                     />
                     <br></br>
-                    <IonCheckbox style={{paddingBottom:'1rem'}}
+                    <IonCheckbox style={{ paddingBottom: '1rem' }}
                       checked={isCreateNewUser}
                       onIonChange={(e) => setIsCreateNewUser(e.detail.checked)}
                     >

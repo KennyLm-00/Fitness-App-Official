@@ -23,7 +23,7 @@ import {
 } from '@ionic/react';
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { getDocs, addDoc, deleteDoc ,collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
+import { getDocs, addDoc, deleteDoc, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
@@ -35,7 +35,7 @@ const Tab3: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(auth.currentUser?.photoURL || null);
   const [updatedImageUrl, setUpdatedImageUrl] = useState<string | null>(null); // New state to manage updated image URL
-  const username = auth.currentUser?.displayName || ''; // Get the username
+  const [userName, setUserName] = useState<string>('');
   const [posts, setPosts] = useState<{ id: string; imageUrl?: string; likedBy: string[]; likes: number }[]>([]);
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const history = useHistory();
@@ -81,9 +81,37 @@ const Tab3: React.FC = () => {
 
     fetchUserPosts();
   }, [history]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) {
+          console.error('User not authenticated.');
+          history.push('/');
+        } else {
+          const emailParts = user.email?.split('@') || [];
+          const userNameFromEmail = emailParts[0] || user.email || '';
+
+          setUserName(userNameFromEmail);
+
+          // Set a default image URL if user.photoURL is null
+          const defaultImageUrl = 'https://ionicframework.com/docs/img/demos/avatar.svg';
+          setUserImageUrl(user.photoURL || defaultImageUrl);
+        }
+      } catch (error) {
+        console.error('Error retrieving user information:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handlePostClick = (post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] }) => {
     setSelectedPost(post);
   };
+
   const closeDetailedView = () => {
     setSelectedPost(null);
   };
@@ -151,26 +179,51 @@ const Tab3: React.FC = () => {
         console.log('No post selected for deletion.');
         return;
       }
-  
+
       // Assuming "posts" is your Firestore collection
       const postRef = doc(firestore, 'posts', postId);
-  
+
       // Delete the post from Firestore
       await deleteDoc(postRef);
-  
+
       // After successful deletion, you might want to update the state
       setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
-  
+
       console.log(`Post with ID ${postId} deleted successfully.`);
     } catch (error) {
       console.error('Error deleting post:', error);
     }
   };
-  
-  const handleDeleteImage = () => {
-    setImageFile(null);
-    setImagePreview(auth.currentUser?.photoURL || null);
+  const handleDeleteImage = async () => {
+    try {
+      if (!auth.currentUser) {
+        console.error('User not authenticated.');
+        return;
+      }
+
+      const userId = auth.currentUser.uid;
+
+      // Clear the image file and preview
+      setImageFile(null);
+      setImagePreview(null);
+      setUpdatedImageUrl(null);
+
+      // Update the user profile picture in Firebase Authentication and Firestore to null
+      await updateProfile(auth.currentUser, { photoURL: null });
+
+      const userDocRef = doc(firestore, 'users', userId);
+      await updateDoc(userDocRef, { photoURL: null });
+
+      // Update the userImageUrl state with the default Ionic person image
+      setUserImageUrl('https://ionicframework.com/docs/img/demos/avatar.svg');
+      setUpdatedImageUrl('https://ionicframework.com/docs/img/demos/avatar.svg'); // Set the updated image URL in the state
+
+      console.log('Profile picture removed successfully.');
+    } catch (error: any) {
+      console.error('Error removing profile picture:', error.message);
+    }
   };
+
   const [liked, setLiked] = useState(false);
 
   const handleLike = async (postId: string, userId: string) => {
@@ -241,17 +294,27 @@ const Tab3: React.FC = () => {
         <IonHeader translucent={false}>
           <IonToolbar>
             <IonButtons slot="start">
-              <img
-                className='profile-image'
-                style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
-                src={updatedImageUrl || auth.currentUser?.photoURL || ''}
-                alt="User Profile Picture"
-              />
+              {userImageUrl && (
+                <img
+                  className='profile-image'
+                  style={{
+                    borderRadius: '50%',
+                    width: '60px', // Increased initial size
+                    height: '60px', // Increased initial size
+                    marginRight: '10px',
+                    imageRendering: 'auto', // Use 'auto' or 'smooth' for better rendering quality
+                  }}
+                  src={userImageUrl}
+                  alt="User Profile Picture"
+                />
+              )}
             </IonButtons>
-            <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>{username ? `${username}` : 'Loading user...'}</IonCardSubtitle>
+            <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>
+              {userName ? `${userName}` : 'Loading user...'}
+            </IonCardSubtitle>
             <IonButtons slot="end">
-              <IonButton href="/" onClick={handleLogout}>
-                <IonIcon style={{ color: 'white' }} icon={logOutOutline}></IonIcon>
+              <IonButton onClick={handleLogout}>
+                <IonIcon style={{ color: "white" }} icon={logOutOutline} />
               </IonButton>
             </IonButtons>
           </IonToolbar>
@@ -273,7 +336,7 @@ const Tab3: React.FC = () => {
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={person} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
-                      {username ? `${username}` : 'Loading user...'}
+                      {userName ? `${userName}` : 'Loading user...'}
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
@@ -402,17 +465,19 @@ const Tab3: React.FC = () => {
                 </IonRow>
                 <IonRow>
                   {/* Detailed view */}
+                  {/* Detailed view */}
                   {selectedPost && (
                     <IonModal isOpen={true} onDidDismiss={closeDetailedView}>
                       <DetailedView
                         post={selectedPost}
-                        username={username}
+                        username={userName}
                         userImageUrl={updatedImageUrl || auth.currentUser?.photoURL || ''}
                         onClose={closeDetailedView}
-                        onLike={(postId) => handleLike(postId, username)}
+                        onLike={(postId) => handleLike(postId, userName)}
                       />
                     </IonModal>
                   )}
+
                 </IonRow>
               </IonGrid>
             </IonCol>
