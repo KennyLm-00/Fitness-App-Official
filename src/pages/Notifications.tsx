@@ -52,40 +52,41 @@ const Notifications: React.FC = () => {
   const handleAcceptFriendRequest = async (username: string) => {
     try {
       const currentUser = auth.currentUser;
-
+  
       if (currentUser) {
         const currentUserDocRef = doc(firestore, 'users', currentUser.uid);
-
+  
         // Fetch sender's user document based on username
         const senderUserQuery = query(collection(firestore, 'users'), where('username', '==', username));
         const senderUserQuerySnapshot = await getDocs(senderUserQuery);
-
+  
         if (!senderUserQuerySnapshot.empty) {
           const senderUserDocRef = senderUserQuerySnapshot.docs[0].ref;
-
+  
           // Update the current user's document to add the new friend using a transaction
           await updateDoc(currentUserDocRef, {
             friends: arrayUnion(username),
             friendRequests: arrayRemove(username),
           });
-
+  
           // Update the sender's document to add the new friend
           await updateDoc(senderUserDocRef, {
             friends: arrayUnion(currentUser.displayName || currentUser.email),
           });
-
+  
           // Fetch the updated friend requests after the changes
           fetchFriendRequests();
           console.log('Friend request accepted successfully!');
         } else {
-          console.error('Sender not found.');
+          console.error('Sender not found. Username:', username);
+          console.log('Sender query snapshot:', senderUserQuerySnapshot.docs);
         }
       }
     } catch (error) {
       console.error('Error accepting friend request:', error);
     }
   };
-
+  
 
   const handleRejectFriendRequest = async (username: string) => {
     try {

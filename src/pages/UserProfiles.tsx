@@ -32,6 +32,7 @@ import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, pe
 const UserProfiles: React.FC = () => {
   const { username } = useParams<{ username?: string }>();
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [friendRequestStatus, setFriendRequestStatus] = useState<string | null>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [selectedPost, setSelectedPost] = useState<{
     id: string;
@@ -88,6 +89,37 @@ const UserProfiles: React.FC = () => {
 
     fetchUserProfileAndPosts();
   }, [username]);
+
+  useEffect(() => {
+    // Check the friend request status when the component mounts
+    const checkFriendRequestStatus = async () => {
+      try {
+        const currentUser = auth.currentUser;
+
+        if (currentUser && userProfile && userProfile.uid) {
+          const userDocRef = doc(firestore, 'users', currentUser.uid);
+          const userDocSnapshot = await getDoc(userDocRef);
+
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+
+            if (userData.friendRequests && userData.friendRequests.includes(userProfile.username)) {
+              // Friend request sent
+              setFriendRequestStatus('sent');
+            } else if (userData.friends && userData.friends.includes(userProfile.username)) {
+              // Already friends
+              setFriendRequestStatus('friends');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking friend request status:', error);
+      }
+    };
+
+    checkFriendRequestStatus();
+  }, [userProfile]);
+
   const handlePostClick = (post: {
     id: string;
     imageUrl?: string | undefined;
@@ -112,13 +144,20 @@ const UserProfiles: React.FC = () => {
       }
 
       if (userProfile && userProfile.username && userProfile.uid) {
-        // Update the recipient's document to include the friend request
-        const recipientUserDocRef = doc(firestore, 'users', userProfile.uid);
-        await updateDoc(recipientUserDocRef, {
-          friendRequests: arrayUnion(currentUser.displayName || currentUser.email),
-        });
+        // Check if the friend request has already been sent or they are already friends
+        if (friendRequestStatus === 'sent') {
+          console.log('Friend request already sent.');
+        } else if (friendRequestStatus === 'friends') {
+          console.log('Already friends.');
+        } else {
+          // Update the recipient's document to include the friend request
+          const recipientUserDocRef = doc(firestore, 'users', userProfile.uid);
+          await updateDoc(recipientUserDocRef, {
+            friendRequests: arrayUnion(currentUser.displayName || currentUser.email),
+          });
 
-        console.log('Friend request sent successfully!');
+          console.log('Friend request sent successfully!');
+        }
       } else {
         console.error('Error: userProfile, userProfile.username, or userProfile.uid is undefined.');
       }
@@ -126,14 +165,11 @@ const UserProfiles: React.FC = () => {
       console.error('Error sending friend request:', error);
     }
   };
-
-
-
   return (
     <IonPage>
       <IonContent className='user-profile' fullscreen>
         <IonHeader translucent={false}>
-        <IonToolbar>
+          <IonToolbar>
             <IonButtons slot="start">
               {userProfile && userProfile.photoURL && (
                 <img
@@ -157,13 +193,13 @@ const UserProfiles: React.FC = () => {
         <IonCol size="12" size-sm="6" style={{ margin: 'auto', padding: '0' }}>
           <IonGrid>
             <IonRow>
-              <IonCol size="6">
+              <IonCol size="4">
                 {/* Display user profile image */}
                 {userProfile && userProfile.photoURL && (
                   <img src={userProfile.photoURL} alt="User Profile" style={{ width: '100%', marginTop: '10px', borderRadius: '50px' }} />
                 )}
               </IonCol>
-              <IonCol size="6" style={{ marginTop: '30px', }}>
+              <IonCol size="8" style={{ marginTop: '30px', }}>
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={person} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                   &nbsp;
@@ -179,12 +215,23 @@ const UserProfiles: React.FC = () => {
                   &nbsp;
                   Idaho
                 </IonCardSubtitle>
-                <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                  <button style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', width: '100%', verticalAlign: 'middle' }}
-                    onClick={handleAddFriend}>
-                    Add
-                  </button>
+                <IonCardSubtitle style={{ textAlign: 'left', fontSize: '0.8rem' }}>
+                  {friendRequestStatus === 'sent' ? (
+                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block',width:'100%' }}>
+                      Sent Request
+                    </span>
+                  ) : friendRequestStatus === 'friends' ? (
+                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block',width:'100%',textAlign:'center'}}>
+                      Friends!
+                    </span>
+                  ) : (
+                    <button style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', width: '100%', verticalAlign: 'middle' }}
+                      onClick={handleAddFriend}>
+                      + Add
+                    </button>
+                  )}
                 </IonCardSubtitle>
+
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -200,16 +247,16 @@ const UserProfiles: React.FC = () => {
                   {/* Posts */}
                   <IonCol size="4">
                     <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                      100
+                      {userPosts.length}
                       <br />
                       Posts
                     </IonCardSubtitle>
                   </IonCol>
 
                   {/* Followers */}
-                  <IonCol size="4">
+             <IonCol size="4">
                     <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
-                      500
+                      {userProfile && userProfile.friends ? userProfile.friends.length : 0}
                       <br />
                       Gym Pals
                     </IonCardSubtitle>

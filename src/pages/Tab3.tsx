@@ -328,7 +328,7 @@ const Tab3: React.FC = () => {
             <IonCol size="12" size-sm="6" style={{ margin: 'auto', padding: '0' }}>
               <IonGrid>
                 <IonRow>
-                  <IonCol size="6">
+                  <IonCol size="4">
                     {updatedImageUrl && (
                       <img src={updatedImageUrl} alt="Updated" style={{ width: '100%', marginTop: '10px', borderRadius: '50px' }} />
                     )}
@@ -336,7 +336,7 @@ const Tab3: React.FC = () => {
                       <img src={imagePreview} alt="Selected" style={{ width: '100%', marginTop: '10px', borderRadius: '50px' }} />
                     )}
                   </IonCol>
-                  <IonCol size="6" style={{ marginTop: '30px', }}>
+                  <IonCol size="8" style={{ marginTop: '30px', }}>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={person} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
@@ -367,11 +367,6 @@ const Tab3: React.FC = () => {
                       <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
                       Idaho
-                    </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                      <IonIcon icon={personAdd} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
-                      &nbsp;
-                      Add
                     </IonCardSubtitle>
                   </IonCol>
                 </IonRow>
