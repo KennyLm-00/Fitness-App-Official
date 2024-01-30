@@ -286,6 +286,7 @@ const Tab3: React.FC = () => {
     setSelectedCategory(category);
     setShowCategoryAlert(false);
   };
+  
   useEffect(() => {
     const user = auth.currentUser;
     if (user && selectedCategory) {

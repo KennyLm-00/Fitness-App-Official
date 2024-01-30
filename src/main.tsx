@@ -76,6 +76,7 @@ const Main: React.FC = () => {
           username,
           email,
           photoURL: imageUrl, // Add the profile picture URL to the document
+          friends: [], // Initialize the 'friends' field
         });
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
