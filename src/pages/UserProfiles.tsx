@@ -53,7 +53,7 @@ const UserProfiles: React.FC = () => {
           if (!userDocsSnapshot.empty) {
             const userDoc = userDocsSnapshot.docs[0];
             const userProfile = userDoc.data();
-      
+
             // Check if the userDoc has the uid field
             if (userDoc.id) {
               userProfile.uid = userDoc.id;
@@ -61,7 +61,7 @@ const UserProfiles: React.FC = () => {
               console.error('Error: uid not found in userDoc');
               return;
             }
-      
+
             console.log('Fetched userProfile:', userProfile);
             // Fetch user posts using username
             const userPostsCollection = collection(firestore, 'posts');
@@ -105,19 +105,19 @@ const UserProfiles: React.FC = () => {
   const handleAddFriend = async () => {
     try {
       const currentUser = auth.currentUser;
-  
+
       if (!currentUser) {
         console.error('Error: User not logged in.');
         return;
       }
-  
+
       if (userProfile && userProfile.username && userProfile.uid) {
         // Update the recipient's document to include the friend request
         const recipientUserDocRef = doc(firestore, 'users', userProfile.uid);
         await updateDoc(recipientUserDocRef, {
           friendRequests: arrayUnion(currentUser.displayName || currentUser.email),
         });
-  
+
         console.log('Friend request sent successfully!');
       } else {
         console.error('Error: userProfile, userProfile.username, or userProfile.uid is undefined.');
@@ -126,19 +126,19 @@ const UserProfiles: React.FC = () => {
       console.error('Error sending friend request:', error);
     }
   };
-  
-  
-  
+
+
+
   return (
     <IonPage>
       <IonContent className='user-profile' fullscreen>
         <IonHeader translucent={false}>
-          <IonToolbar>
+        <IonToolbar>
             <IonButtons slot="start">
               {userProfile && userProfile.photoURL && (
                 <img
                   className='profile-image'
-                  style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
+                  style={{ borderRadius: '50%', width: '45px', height: '50px', marginRight: '10px' }}
                   src={userProfile.photoURL}
                   alt="User Profile Picture"
                 />
@@ -172,7 +172,7 @@ const UserProfiles: React.FC = () => {
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                   &nbsp;
-                  Lift Category
+                  {userProfile && userProfile.liftCategory ? userProfile.liftCategory : 'Lift Category'}
                 </IonCardSubtitle>
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
@@ -180,10 +180,10 @@ const UserProfiles: React.FC = () => {
                   Idaho
                 </IonCardSubtitle>
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                  <IonButton onClick={handleAddFriend}>
-                    <IonIcon icon={personAdd} />
-                    Add Friend
-                  </IonButton>
+                  <button style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', width: '100%', verticalAlign: 'middle' }}
+                    onClick={handleAddFriend}>
+                    Add
+                  </button>
                 </IonCardSubtitle>
               </IonCol>
             </IonRow>
