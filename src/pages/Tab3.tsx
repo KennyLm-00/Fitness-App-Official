@@ -21,15 +21,18 @@ import {
   IonCardSubtitle,
   IonAlert
 } from '@ionic/react';
+import { IonList, IonItem } from '@ionic/react';
+
 import { uploadBytes, ref, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { getDocs, addDoc, deleteDoc, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
+import { getDocs, getDoc, addDoc, deleteDoc, collection, updateDoc, doc, arrayRemove, arrayUnion, query, where } from 'firebase/firestore';
 import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal, pencil } from 'ionicons/icons';
 import DetailedView from './DetailedView'; // Import DetailedView
+import { FaPencilAlt } from "react-icons/fa";
 
 const Tab3: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -45,9 +48,13 @@ const Tab3: React.FC = () => {
     id: string; imageUrl?: string |
     undefined; likes: number; likedBy: string[]
   } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const liftCategories = ['PowerLifting', 'BodyBuilding', 'Calisthenics',
+    'CrossFit']; // Add your own categories
+  const [showCategoryAlert, setShowCategoryAlert] = useState(false);
 
   useEffect(() => {
-    const fetchUserPosts = async () => {
+    const fetchUserData = async () => {
       try {
         const user = auth.currentUser;
 
@@ -55,31 +62,30 @@ const Tab3: React.FC = () => {
           console.error('User not authenticated.');
           history.push('/');
         } else {
-          const userId = user.uid;
+          const emailParts = user.email?.split('@') || [];
+          const userNameFromEmail = emailParts[0] || user.email || '';
 
-          // Fetch posts for the current user from Firestore
-          const userPostsCollection = collection(firestore, 'posts');
-          const userPostsQuery = query(userPostsCollection, where('userId', '==', userId));
-          const querySnapshot = await getDocs(userPostsQuery);
+          setUserName(userNameFromEmail);
 
-          const userPostsData = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            imageUrl: doc.data().imageUrl,
-            likedBy: doc.data().likedBy,
-            likes: doc.data().likes,
-            caption: doc.data().caption, // Include caption property
-            category: doc.data().category, // Include category property
-            // Add other necessary fields from your Firestore document
-          }));
+          // Set a default image URL if user.photoURL is null
+          const defaultImageUrl = 'https://ionicframework.com/docs/img/demos/avatar.svg';
+          setUserImageUrl(user.photoURL || defaultImageUrl);
 
-          setPosts(userPostsData);
+          // Fetch user data including the lift category
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const userDocSnapshot = await getDoc(userDocRef);
+          const userDocData = userDocSnapshot.data();
+
+          if (userDocData) {
+            setSelectedCategory(userDocData.liftCategory || null);
+          }
         }
       } catch (error) {
-        console.error('Error retrieving user posts:', error);
+        console.error('Error retrieving user information:', error);
       }
     };
 
-    fetchUserPosts();
+    fetchUserData();
   }, [history]);
 
   useEffect(() => {
@@ -287,7 +293,23 @@ const Tab3: React.FC = () => {
       console.error('Could not like/unlike post: ', error);
     }
   };
-
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setShowCategoryAlert(false);
+  };
+  const handleCategorySelect2 = () => {
+    setShowCategoryAlert(true);
+  };
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user && selectedCategory) {
+      const userDocRef = doc(firestore, 'users', user.uid);
+      // Update the 'liftCategory' field in the user's document
+      updateDoc(userDocRef, { liftCategory: selectedCategory })
+        .then(() => console.log('Lift category updated successfully'))
+        .catch((error) => console.error('Error updating lift category:', error));
+    }
+  }, [selectedCategory]);
   return (
     <IonPage>
       <IonContent fullscreen>
@@ -297,13 +319,7 @@ const Tab3: React.FC = () => {
               {userImageUrl && (
                 <img
                   className='profile-image'
-                  style={{
-                    borderRadius: '50%',
-                    width: '60px', // Increased initial size
-                    height: '60px', // Increased initial size
-                    marginRight: '10px',
-                    imageRendering: 'auto', // Use 'auto' or 'smooth' for better rendering quality
-                  }}
+                  style={{ borderRadius: '50%', width: '45px', height: '50px', marginRight: '10px' }}
                   src={userImageUrl}
                   alt="User Profile Picture"
                 />
@@ -341,7 +357,16 @@ const Tab3: React.FC = () => {
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
-                      Lift Category
+                      {selectedCategory ? (
+                        <>
+                          {selectedCategory}
+                          <FaPencilAlt onClick={handleCategorySelect2} style={{ marginLeft: '8px', fontSize: '1rem', color: 'white' }} />
+                        </>
+                      ) : (
+                        <IonButton onClick={() => setShowCategoryAlert(true)} fill="clear" style={{ color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                          Choose Category
+                        </IonButton>
+                      )}
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
@@ -389,7 +414,7 @@ const Tab3: React.FC = () => {
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                           100
                           <br />
-                          Posts
+                          Workouts
                         </IonCardSubtitle>
                       </IonCol>
 
@@ -417,7 +442,7 @@ const Tab3: React.FC = () => {
             </IonCol>
             <IonCol size="12">
               <IonCardHeader>
-                <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Posts</IonCardSubtitle>
+                <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Workouts</IonCardSubtitle>
               </IonCardHeader>
               <IonGrid style={{ padding: '0px' }}>
                 <IonRow style={{ padding: '0px' }}>
@@ -479,6 +504,38 @@ const Tab3: React.FC = () => {
                   )}
 
                 </IonRow>
+                <IonAlert isOpen={showCategoryAlert} onDidDismiss={() => setShowCategoryAlert(false)}>
+                  <IonContent>
+                    <IonList>
+                      {liftCategories.map((category) => (
+                        <IonItem key={category} onClick={() => handleCategorySelect(category)}>
+                          {category}
+                        </IonItem>
+                      ))}
+                    </IonList>
+                  </IonContent>
+                </IonAlert>
+                <IonAlert
+                  isOpen={showCategoryAlert}
+                  onDidDismiss={() => setShowCategoryAlert(false)}
+                  header="Choose Lift Category"
+                  inputs={liftCategories.map((category) => ({
+                    name: category,
+                    type: 'radio',
+                    label: category,
+                    value: category,
+                  }))}
+                  buttons={[
+                    {
+                      text: 'Cancel',
+                      role: 'cancel',
+                    },
+                    {
+                      text: 'OK',
+                      handler: (selectedCategory) => handleCategorySelect(selectedCategory),
+                    },
+                  ]}
+                />
               </IonGrid>
             </IonCol>
           </IonRow>

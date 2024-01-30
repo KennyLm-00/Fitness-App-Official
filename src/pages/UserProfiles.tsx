@@ -106,7 +106,7 @@ const UserProfiles: React.FC = () => {
               {userProfile && userProfile.photoURL && (
                 <img
                   className='profile-image'
-                  style={{ borderRadius: '50%', width: '40px', height: '40px', marginRight: '10px' }}
+                  style={{ borderRadius: '50%', width: '45px', height: '50px', marginRight: '10px' }}
                   src={userProfile.photoURL}
                   alt="User Profile Picture"
                 />
@@ -169,7 +169,7 @@ const UserProfiles: React.FC = () => {
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                           100
                           <br />
-                          Posts
+                          Workouts
                         </IonCardSubtitle>
                       </IonCol>
 
@@ -197,7 +197,7 @@ const UserProfiles: React.FC = () => {
             </IonCol>
         <IonGrid>
           <IonCardHeader>
-            <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Posts</IonCardSubtitle>
+            <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Workouts</IonCardSubtitle>
           </IonCardHeader>
           <IonRow>
             {userPosts.map((post) => (
