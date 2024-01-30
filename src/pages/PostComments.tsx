@@ -1,10 +1,16 @@
-// PostComments.tsx
 import React, { useState, useEffect } from 'react';
 import { IonCardContent, IonText, IonIcon, IonAvatar } from '@ionic/react';
 import { HiOutlineChatBubbleBottomCenterText } from 'react-icons/hi2';
 import { send, close } from 'ionicons/icons';
 import { auth, firestore } from '../firebase/firebaseConfig';
-import { collection, query, onSnapshot, orderBy, DocumentData } from 'firebase/firestore'; // Import firestore and DocumentData
+import {
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+  DocumentData,
+  addDoc,
+} from 'firebase/firestore';
 
 interface Comment {
   id: string;
@@ -16,30 +22,42 @@ interface Comment {
 
 interface PostCommentsProps {
     postId: string;
-    comments: Comment[];  // Make sure this line is present
-    onAddComment: (postId: string, commentText: string) => void;
+    comments: Comment[]; // Add this line
+    onAddComment: (commentText: string) => void;
     onCloseComments: () => void;
   }
   
 
-const PostComments: React.FC<PostCommentsProps> = ({ postId, onAddComment, onCloseComments }) => {
+const PostComments: React.FC<PostCommentsProps> = ({
+  postId,
+  onAddComment,
+  onCloseComments,
+}) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
 
   useEffect(() => {
-    const commentsCollection = collection(firestore, 'posts', postId, 'comments');
+    const commentsCollection = collection(
+      firestore,
+      'posts',
+      postId,
+      'comments'
+    );
     const commentsQuery = query(commentsCollection, orderBy('timestamp'));
 
     const unsubscribe = onSnapshot(commentsQuery, (snapshot) => {
       const updatedComments: Comment[] = snapshot.docs.map((doc) => {
-        const data = doc.data() as DocumentData; // Use DocumentData
-        // Handle the case where document data is missing required properties
+        const data = doc.data() as DocumentData;
         return {
           id: doc.id,
           text: data.text || '',
-          timestamp: data.timestamp ? new Date(data.timestamp.toMillis()) : new Date(),
+          timestamp: data.timestamp
+            ? new Date(data.timestamp.toMillis())
+            : new Date(),
           user: data.user || '',
-          userImageUrl: data.userImageUrl || 'https://ionicframework.com/docs/img/demos/avatar.svg',
+          userImageUrl:
+            data.userImageUrl ||
+            'https://ionicframework.com/docs/img/demos/avatar.svg',
         };
       });
       setComments(updatedComments);
@@ -49,6 +67,35 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, onAddComment, onClo
       unsubscribe();
     };
   }, [postId]);
+
+  const handleAddComment = async () => {
+    try {
+      const user = auth.currentUser;
+
+      if (user) {
+        const comment = {
+          text: commentText,
+          timestamp: new Date(),
+          user: user.displayName || user.email || '',
+          userImageUrl: user.photoURL || '',
+        };
+
+        // Update Firestore
+        const commentsCollection = collection(
+          firestore,
+          'posts',
+          postId,
+          'comments'
+        );
+        const docRef = await addDoc(commentsCollection, comment);
+
+        // Clear the comment text after adding
+        setCommentText('');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
 
   return (
     <IonCardContent className="post-comments-overlay">
@@ -61,11 +108,20 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, onAddComment, onClo
         {comments.map((comment: Comment) => (
           <div key={comment.id} className="comment-item">
             {/* User Avatar and Username */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '8px',
+              }}
+            >
               <IonAvatar style={{ marginRight: '8px' }}>
                 <img
                   alt="User avatar"
-                  src={comment.userImageUrl || 'https://ionicframework.com/docs/img/demos/avatar.svg'}
+                  src={
+                    comment.userImageUrl ||
+                    'https://ionicframework.com/docs/img/demos/avatar.svg'
+                  }
                 />
               </IonAvatar>
               <strong style={{ marginRight: '8px' }}>{comment.user}</strong>
@@ -79,7 +135,12 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, onAddComment, onClo
       {/* Add Comment Section */}
       <div className="add-comment-section">
         <input
-          style={{ width: '90%', borderRadius: '10px', background: '#1b221f', color: 'white' }}
+          style={{
+            width: '90%',
+            borderRadius: '10px',
+            background: '#1b221f',
+            color: 'white',
+          }}
           type="text"
           placeholder="Add a comment..."
           value={commentText}
@@ -95,10 +156,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, onAddComment, onClo
             textAlign: 'center',
           }}
           icon={send}
-          onClick={() => {
-            onAddComment(postId, commentText);
-            setCommentText('');
-          }}
+          onClick={handleAddComment}
         />
       </div>
     </IonCardContent>
