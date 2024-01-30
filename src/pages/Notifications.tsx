@@ -3,31 +3,31 @@ import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonTitle, IonList,
 import { arrowBack } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
-import { getDoc, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, arrayUnion, collection, query, getDocs, where, arrayRemove } from 'firebase/firestore';
 
 const Notifications: React.FC = () => {
   const history = useHistory();
   const [friendRequests, setFriendRequests] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchFriendRequests = async () => {
-      try {
-        const currentUser = auth.currentUser;
+  const fetchFriendRequests = async () => {
+    try {
+      const currentUser = auth.currentUser;
 
-        if (currentUser) {
-          const userDocRef = doc(firestore, 'users', currentUser.uid);
-          const userDocSnapshot = await getDoc(userDocRef);
+      if (currentUser) {
+        const userDocRef = doc(firestore, 'users', currentUser.uid);
+        const userDocSnapshot = await getDoc(userDocRef);
 
-          if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-            setFriendRequests(userData.friendRequests || []);
-          }
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          setFriendRequests(userData.friendRequests || []);
         }
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching friend requests:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchFriendRequests();
   }, []);
 
@@ -49,27 +49,43 @@ const Notifications: React.FC = () => {
       console.error('Error updating friend requests in Firestore:', error);
     }
   };
-
   const handleAcceptFriendRequest = async (username: string) => {
     try {
-      const updatedFriendRequests = friendRequests.filter((request) => request !== username);
-      setFriendRequests(updatedFriendRequests);
-
-      // Update the current user's document to add the new friend using a transaction
       const currentUser = auth.currentUser;
+
       if (currentUser) {
         const currentUserDocRef = doc(firestore, 'users', currentUser.uid);
-        await updateDoc(currentUserDocRef, {
-          friends: arrayUnion(username),
-          friendRequests: updatedFriendRequests,
-        });
 
-        console.log('Friend request accepted successfully!');
+        // Fetch sender's user document based on username
+        const senderUserQuery = query(collection(firestore, 'users'), where('username', '==', username));
+        const senderUserQuerySnapshot = await getDocs(senderUserQuery);
+
+        if (!senderUserQuerySnapshot.empty) {
+          const senderUserDocRef = senderUserQuerySnapshot.docs[0].ref;
+
+          // Update the current user's document to add the new friend using a transaction
+          await updateDoc(currentUserDocRef, {
+            friends: arrayUnion(username),
+            friendRequests: arrayRemove(username),
+          });
+
+          // Update the sender's document to add the new friend
+          await updateDoc(senderUserDocRef, {
+            friends: arrayUnion(currentUser.displayName || currentUser.email),
+          });
+
+          // Fetch the updated friend requests after the changes
+          fetchFriendRequests();
+          console.log('Friend request accepted successfully!');
+        } else {
+          console.error('Sender not found.');
+        }
       }
     } catch (error) {
       console.error('Error accepting friend request:', error);
     }
   };
+
 
   const handleRejectFriendRequest = async (username: string) => {
     try {
@@ -84,7 +100,6 @@ const Notifications: React.FC = () => {
       console.error('Error rejecting friend request:', error);
     }
   };
-
   return (
     <IonPage>
       <IonContent>
