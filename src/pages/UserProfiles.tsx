@@ -67,7 +67,7 @@ const UserProfiles: React.FC = () => {
               ...doc.data(),
             }));
 
-            setUserProfile(userProfile);
+            setUserProfile({ ...userProfile, selectedCategory: userProfile.liftCategory || 'Default Category' });
             setUserPosts(postsData);
           } else {
             console.error('User not found.');
@@ -137,15 +137,16 @@ const UserProfiles: React.FC = () => {
                   &nbsp;
                   {username ? `${username}` : 'Loading user...'}
                 </IonCardSubtitle>
+                {/* Display lift category information */}
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                   &nbsp;
-                  Lift Category
+                  {userProfile && userProfile.liftCategory ? userProfile.liftCategory : 'No lift category'}
                 </IonCardSubtitle>
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                   &nbsp;
-                  Idaho
+                  {userProfile && userProfile.location ? userProfile.location : 'No location'}
                 </IonCardSubtitle>
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={personAdd} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
@@ -157,44 +158,44 @@ const UserProfiles: React.FC = () => {
           </IonGrid>
         </IonCol>
         <IonCol size="12">
-              <IonCard style={{width:'94%'}}>
-                {/* <IonCardHeader>
+          <IonCard style={{ width: '94%' }}>
+            {/* <IonCardHeader>
                   <IonCardTitle className='ion-text-center'>Profile Stats</IonCardTitle>
                 </IonCardHeader> */}
-                <IonCardContent>
-                  <IonGrid>
-                    <IonRow>
-                      {/* Posts */}
-                      <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                          100
-                          <br />
-                          Workouts
-                        </IonCardSubtitle>
-                      </IonCol>
+            <IonCardContent>
+              <IonGrid>
+                <IonRow>
+                  {/* Posts */}
+                  <IonCol size="4">
+                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                      100
+                      <br />
+                      Workouts
+                    </IonCardSubtitle>
+                  </IonCol>
 
-                      {/* Followers */}
-                      <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
-                          500
-                          <br />
-                          Gym Pals
-                        </IonCardSubtitle>
-                      </IonCol>
+                  {/* Followers */}
+                  <IonCol size="4">
+                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
+                      500
+                      <br />
+                      Gym Pals
+                    </IonCardSubtitle>
+                  </IonCol>
 
-                      {/* Following */}
-                      <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                          300
-                          <br />
-                          Workouts
-                        </IonCardSubtitle>
-                      </IonCol>
-                    </IonRow>
-                  </IonGrid>
-                </IonCardContent>
-              </IonCard>
-            </IonCol>
+                  {/* Following */}
+                  <IonCol size="4">
+                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                      300
+                      <br />
+                      Workouts
+                    </IonCardSubtitle>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonCardContent>
+          </IonCard>
+        </IonCol>
         <IonGrid>
           <IonCardHeader>
             <IonCardSubtitle className='ion-text-center' style={{ color: 'white' }}>Workouts</IonCardSubtitle>

@@ -30,7 +30,7 @@ import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal, pencil } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal } from 'ionicons/icons';
 import DetailedView from './DetailedView'; // Import DetailedView
 import { FaPencilAlt } from "react-icons/fa";
 
@@ -54,65 +54,54 @@ const Tab3: React.FC = () => {
   const [showCategoryAlert, setShowCategoryAlert] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
         const user = auth.currentUser;
 
         if (!user) {
           console.error('User not authenticated.');
           history.push('/');
-        } else {
-          const emailParts = user.email?.split('@') || [];
-          const userNameFromEmail = emailParts[0] || user.email || '';
+          return;
+        }
 
-          setUserName(userNameFromEmail);
+        const userId = user.uid;
 
-          // Set a default image URL if user.photoURL is null
+        // Fetch user data including the lift category
+        const userDocRef = doc(firestore, 'users', userId);
+        const userDocSnapshot = await getDoc(userDocRef);
+        const userDocData = userDocSnapshot.data();
+
+        if (userDocData) {
+          console.log('User Document Data:', userDocData);
+          setUserName(userDocData.username);// Add this line
+  
           const defaultImageUrl = 'https://ionicframework.com/docs/img/demos/avatar.svg';
-          setUserImageUrl(user.photoURL || defaultImageUrl);
+          setUserImageUrl(userDocData.photoURL || defaultImageUrl);
+          setSelectedCategory(userDocData.liftCategory || null);
 
-          // Fetch user data including the lift category
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const userDocSnapshot = await getDoc(userDocRef);
-          const userDocData = userDocSnapshot.data();
+          // Fetch posts for the current user from Firestore
+          const userPostsCollection = collection(firestore, 'posts');
+          const userPostsQuery = query(userPostsCollection, where('userId', '==', userId));
+          const querySnapshot = await getDocs(userPostsQuery);
 
-          if (userDocData) {
-            setSelectedCategory(userDocData.liftCategory || null);
-          }
+          const userPostsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            imageUrl: doc.data().imageUrl,
+            likedBy: doc.data().likedBy,
+            likes: doc.data().likes,
+            caption: doc.data().caption,
+            category: doc.data().category,
+          }));
+
+          setPosts(userPostsData);
         }
       } catch (error) {
-        console.error('Error retrieving user information:', error);
+        console.error('Error retrieving user information and posts:', error);
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, [history]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const user = auth.currentUser;
-
-        if (!user) {
-          console.error('User not authenticated.');
-          history.push('/');
-        } else {
-          const emailParts = user.email?.split('@') || [];
-          const userNameFromEmail = emailParts[0] || user.email || '';
-
-          setUserName(userNameFromEmail);
-
-          // Set a default image URL if user.photoURL is null
-          const defaultImageUrl = 'https://ionicframework.com/docs/img/demos/avatar.svg';
-          setUserImageUrl(user.photoURL || defaultImageUrl);
-        }
-      } catch (error) {
-        console.error('Error retrieving user information:', error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   const handlePostClick = (post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] }) => {
     setSelectedPost(post);
@@ -297,9 +286,6 @@ const Tab3: React.FC = () => {
     setSelectedCategory(category);
     setShowCategoryAlert(false);
   };
-  const handleCategorySelect2 = () => {
-    setShowCategoryAlert(true);
-  };
   useEffect(() => {
     const user = auth.currentUser;
     if (user && selectedCategory) {
@@ -328,6 +314,7 @@ const Tab3: React.FC = () => {
             <IonCardSubtitle style={{ fontSize: '12px', color: 'white', fontWeight: '600', margin: 'auto' }}>
               {userName ? `${userName}` : 'Loading user...'}
             </IonCardSubtitle>
+
             <IonButtons slot="end">
               <IonButton onClick={handleLogout}>
                 <IonIcon style={{ color: "white" }} icon={logOutOutline} />
@@ -355,13 +342,20 @@ const Tab3: React.FC = () => {
                       {userName ? `${userName}` : 'Loading user...'}
                     </IonCardSubtitle>
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                      <IonIcon icon={barbell} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                      <IonIcon
+                        icon={barbell}
+                        style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }}
+                      />
                       &nbsp;
                       {selectedCategory ? (
-                        <>
+                        <span>
                           {selectedCategory}
-                          <FaPencilAlt onClick={handleCategorySelect2} style={{ marginLeft: '8px', fontSize: '1rem', color: 'white' }} />
-                        </>
+                          &nbsp;
+                          <FaPencilAlt
+                            onClick={() => setShowCategoryAlert(true)}
+                            style={{ fontSize: '0.8rem', fontWeight: 'bold' }}
+                          />
+                        </span>
                       ) : (
                         <IonButton onClick={() => setShowCategoryAlert(true)} fill="clear" style={{ color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
                           Choose Category
