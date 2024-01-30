@@ -3,7 +3,7 @@ import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonTitle, IonList,
 import { arrowBack } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
-import { getDocs, collection, doc, where, query, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
 const Notifications: React.FC = () => {
   const history = useHistory();
@@ -15,13 +15,11 @@ const Notifications: React.FC = () => {
         const currentUser = auth.currentUser;
 
         if (currentUser) {
-          // Fetch the current user's document
           const userDocRef = doc(firestore, 'users', currentUser.uid);
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
             const userData = userDocSnapshot.data();
-            // Assuming you stored friend requests as usernames in the `friendRequests` array
             setFriendRequests(userData.friendRequests || []);
           }
         }
@@ -37,36 +35,55 @@ const Notifications: React.FC = () => {
     history.goBack(); // Go back to the previous page
   };
 
+  const updateFriendRequestsInFirestore = async (updatedFriendRequests: string[]) => {
+    try {
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userDocRef = doc(firestore, 'users', currentUser.uid);
+        await updateDoc(userDocRef, {
+          friendRequests: updatedFriendRequests,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating friend requests in Firestore:', error);
+    }
+  };
+
   const handleAcceptFriendRequest = async (username: string) => {
     try {
+      const updatedFriendRequests = friendRequests.filter((request) => request !== username);
+      setFriendRequests(updatedFriendRequests);
+
       // Update the current user's document to add the new friend using a transaction
       const currentUser = auth.currentUser;
       if (currentUser) {
         const currentUserDocRef = doc(firestore, 'users', currentUser.uid);
         await updateDoc(currentUserDocRef, {
           friends: arrayUnion(username),
+          friendRequests: updatedFriendRequests,
         });
-  
-        // Remove the friend request from the friendRequests array
-        setFriendRequests((prevRequests) => prevRequests.filter((request) => request !== username));
-  
+
         console.log('Friend request accepted successfully!');
       }
     } catch (error) {
       console.error('Error accepting friend request:', error);
     }
   };
-  
+
   const handleRejectFriendRequest = async (username: string) => {
     try {
+      const updatedFriendRequests = friendRequests.filter((request) => request !== username);
+      setFriendRequests(updatedFriendRequests);
+
       // Remove the friend request from the friendRequests array using a transaction
-      setFriendRequests((prevRequests) => prevRequests.filter((request) => request !== username));
+      await updateFriendRequestsInFirestore(updatedFriendRequests);
+
       console.log('Friend request rejected successfully!');
     } catch (error) {
       console.error('Error rejecting friend request:', error);
     }
   };
-  
 
   return (
     <IonPage>
@@ -80,7 +97,6 @@ const Notifications: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonList>
-          {/* Render friend requests dynamically */}
           {friendRequests.map((requestUsername) => (
             <IonItem key={requestUsername}>
               <IonLabel>{`${requestUsername} sent you a friend request`}</IonLabel>
