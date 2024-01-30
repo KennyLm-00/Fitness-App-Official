@@ -27,7 +27,6 @@ import {
 } from '@ionic/react';
 import { logOutOutline, heartOutline, heart, barbellOutline, notificationsOutline, send } from 'ionicons/icons';
 import PostComments from './PostComments'; // Import the new component
-
 import { useHistory } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
 import { FaRegCommentDots } from "react-icons/fa6";
@@ -36,7 +35,7 @@ import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { FaBell } from "react-icons/fa";
 import { GoHeart } from "react-icons/go";
 import { notifications } from 'ionicons/icons'
-import { getDocs, collection, updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
+import { getDocs, addDoc, collection, updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import '@ionic/react/css/ionic-swiper.css';
@@ -129,7 +128,7 @@ const Tab1: React.FC = () => {
           text: commentText,
           timestamp: new Date(),
           user: user.displayName || user.email || '',
-          // ...other comment-related fields
+          userImageUrl: user.photoURL || '',
         };
 
         // Update the state
@@ -146,18 +145,38 @@ const Tab1: React.FC = () => {
         });
 
         // Update Firestore
-        const postRef = doc(firestore, 'posts', postId);
-        await updateDoc(postRef, {
-          comments: arrayUnion(comment),
-        });
+        const commentsCollection = collection(firestore, 'posts', postId, 'comments');
+        const docRef = await addDoc(commentsCollection, comment);
+        const newCommentId = docRef.id;
 
         // Clear the comment text after adding
         setCommentText('');
+
+        // Retrieve the updated comments from Firestore
+        const updatedCommentsQuerySnapshot = await getDocs(commentsCollection);
+        const updatedComments = updatedCommentsQuerySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Update the state with the latest comments
+        setPosts((prevPosts) => {
+          return prevPosts.map((prevPost) => {
+            if (prevPost.id === postId) {
+              return {
+                ...prevPost,
+                comments: updatedComments,
+              };
+            }
+            return prevPost;
+          });
+        });
       }
     } catch (error) {
       console.error('Error adding comment:', error);
     }
   };
+
 
 
   const handleLogout = async () => {
@@ -368,15 +387,14 @@ const Tab1: React.FC = () => {
                     </div>
 
                     {/* Display comments only if showComments is true */}
+                    {/* Display comments only if showComments is true */}
                     {showCommentsForPostId === post.id && (
-                     <PostComments
-                     comments={post.comments.map((comment: Comment) => ({
-                       ...comment,
-                       userImageUrl: comment.user === userName ? userImageUrl : post.userImageUrl,
-                     })) || []}
-                     onAddComment={(commentText) => handleAddComment(post.id, commentText)}
-                     onCloseComments={() => setShowCommentsForPostId(null)}
-                   />
+                      <PostComments
+                        postId={post.id}
+                        comments={post.comments || []}  // Pass the comments from the post
+                        onAddComment={(commentText) => handleAddComment(post.id, commentText)}
+                        onCloseComments={() => setShowCommentsForPostId(null)}
+                      />
                     )}
                   </IonCard>
                 </IonCol>
