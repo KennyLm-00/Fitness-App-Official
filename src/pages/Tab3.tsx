@@ -43,47 +43,44 @@ const Tab3: React.FC = () => {
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const history = useHistory();
   const [userImageUrl, setUserImageUrl] = useState<string>('');
-  // const [selectedPost, setSelectedPost] = useState<{ id: string; imageUrl?: string | undefined } | null>(null);
   const [selectedPost, setSelectedPost] = useState<{
     id: string; imageUrl?: string |
     undefined; likes: number; likedBy: string[]
   } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const liftCategories = ['PowerLifting', 'BodyBuilding', 'Calisthenics',
-    'CrossFit']; // Add your own categories
+    'CrossFit'];
   const [showCategoryAlert, setShowCategoryAlert] = useState(false);
-
+  const [postsCount, setPostsCount] = useState<number>(0); // New state to store posts count
+  const [gymPalsCount, setGymPalsCount] = useState<number>(0); // New state to store gym pals count
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = auth.currentUser;
-
+  
         if (!user) {
           console.error('User not authenticated.');
           history.push('/');
           return;
         }
-
+  
         const userId = user.uid;
-
+  
         // Fetch user data including the lift category
         const userDocRef = doc(firestore, 'users', userId);
         const userDocSnapshot = await getDoc(userDocRef);
         const userDocData = userDocSnapshot.data();
-
-        if (userDocData) {
-          console.log('User Document Data:', userDocData);
-          setUserName(userDocData.username);// Add this line
   
-          const defaultImageUrl = 'https://ionicframework.com/docs/img/demos/avatar.svg';
-          setUserImageUrl(userDocData.photoURL || defaultImageUrl);
+        if (userDocData) {
+          setUserName(userDocData.username); // Move this line here
+          console.log('User Document Data:', userDocData);
+          setUserImageUrl(userDocData.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg');
           setSelectedCategory(userDocData.liftCategory || null);
-
           // Fetch posts for the current user from Firestore
           const userPostsCollection = collection(firestore, 'posts');
           const userPostsQuery = query(userPostsCollection, where('userId', '==', userId));
           const querySnapshot = await getDocs(userPostsQuery);
-
+  
           const userPostsData = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             imageUrl: doc.data().imageUrl,
@@ -92,16 +89,30 @@ const Tab3: React.FC = () => {
             caption: doc.data().caption,
             category: doc.data().category,
           }));
-
+  
+          setPostsCount(userPostsData.length); // Set posts count
           setPosts(userPostsData);
+          const gymPalsQuery = query(collection(firestore, 'users'), where('friends', 'array-contains', userDocData.username));
+          const gymPalsSnapshot = await getDocs(gymPalsQuery);
+          const gymPalsData = gymPalsSnapshot.docs.map((doc) => doc.data());
+        
+          console.log('Gym Pals Query:', gymPalsQuery);
+          console.log('Gym Pals Snapshot:', gymPalsSnapshot);
+          console.log('Gym Pals Data:', gymPalsData);
+        
+          setGymPalsCount(gymPalsSnapshot.size); // Set gym pals count
+        
+          console.log('Gym Pals Count:', gymPalsSnapshot.size);
         }
       } catch (error) {
         console.error('Error retrieving user information and posts:', error);
       }
     };
-
+  
     fetchData();
-  }, [history]);
+  }, [userName, history]);
+  
+  
 
   const handlePostClick = (post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] }) => {
     setSelectedPost(post);
@@ -286,7 +297,7 @@ const Tab3: React.FC = () => {
     setSelectedCategory(category);
     setShowCategoryAlert(false);
   };
-  
+
   useEffect(() => {
     const user = auth.currentUser;
     if (user && selectedCategory) {
@@ -402,22 +413,22 @@ const Tab3: React.FC = () => {
                       {/* Posts */}
                       <IonCol size="4">
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                          100
+                          {postsCount}
                           <br />
-                          Workouts
+                          Posts
                         </IonCardSubtitle>
                       </IonCol>
 
-                      {/* Followers */}
+                      {/* Gym Pals */}
                       <IonCol size="4">
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
-                          500
+                          {gymPalsCount}
                           <br />
                           Gym Pals
                         </IonCardSubtitle>
                       </IonCol>
 
-                      {/* Following */}
+                      {/* Workouts */}
                       <IonCol size="4">
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                           300
