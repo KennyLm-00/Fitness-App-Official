@@ -73,7 +73,7 @@ const Tab3: React.FC = () => {
   
         if (userDocData) {
           setUserName(userDocData.username); // Move this line here
-          console.log('User Document Data:', userDocData);
+          // console.log('User Document Data:', userDocData);
           setUserImageUrl(userDocData.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg');
           setSelectedCategory(userDocData.liftCategory || null);
           // Fetch posts for the current user from Firestore
@@ -96,13 +96,13 @@ const Tab3: React.FC = () => {
           const gymPalsSnapshot = await getDocs(gymPalsQuery);
           const gymPalsData = gymPalsSnapshot.docs.map((doc) => doc.data());
         
-          console.log('Gym Pals Query:', gymPalsQuery);
-          console.log('Gym Pals Snapshot:', gymPalsSnapshot);
-          console.log('Gym Pals Data:', gymPalsData);
+          // console.log('Gym Pals Query:', gymPalsQuery);
+          // console.log('Gym Pals Snapshot:', gymPalsSnapshot);
+          // console.log('Gym Pals Data:', gymPalsData);
         
           setGymPalsCount(gymPalsSnapshot.size); // Set gym pals count
         
-          console.log('Gym Pals Count:', gymPalsSnapshot.size);
+          // console.log('Gym Pals Count:', gymPalsSnapshot.size);
         }
       } catch (error) {
         console.error('Error retrieving user information and posts:', error);
@@ -304,8 +304,8 @@ const Tab3: React.FC = () => {
       const userDocRef = doc(firestore, 'users', user.uid);
       // Update the 'liftCategory' field in the user's document
       updateDoc(userDocRef, { liftCategory: selectedCategory })
-        .then(() => console.log('Lift category updated successfully'))
-        .catch((error) => console.error('Error updating lift category:', error));
+        // .then(() => console.log('Lift category updated successfully'))
+        // .catch((error) => console.error('Error updating lift category:', error));
     }
   }, [selectedCategory]);
   return (
@@ -377,7 +377,12 @@ const Tab3: React.FC = () => {
                     <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                       <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                       &nbsp;
-                      Idaho
+                      Your gyms
+                    </IonCardSubtitle>
+                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
+                      <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                      &nbsp;
+                        Splits 
                     </IonCardSubtitle>
                   </IonCol>
                 </IonRow>

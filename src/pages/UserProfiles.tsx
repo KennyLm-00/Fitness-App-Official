@@ -215,7 +215,7 @@ const UserProfiles: React.FC = () => {
                 <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                   <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                   &nbsp;
-                  Idaho
+                  Gyms
                 </IonCardSubtitle>
                 <IonCardSubtitle style={{ textAlign: 'left', fontSize: '0.8rem' }}>
                   {friendRequestStatus === 'sent' ? (
