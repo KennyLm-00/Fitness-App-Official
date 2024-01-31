@@ -114,7 +114,7 @@ const Notifications: React.FC = () => {
         <IonHeader>
           <IonToolbar className="ion-toolbar-custom" style={{ boxShadow: 'none', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>
             <button onClick={handleBackButtonClick} style={{ background: 'transparent', fontSize: '2.0rem' }}>
-              <IonIcon slot="icon-only" icon={arrowBack} />
+              <IonIcon slot="icon-only" icon={arrowBack} style={{color:'white'}}/>
             </button>
             <IonTitle>Notifications</IonTitle>
           </IonToolbar>
