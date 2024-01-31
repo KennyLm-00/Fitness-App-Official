@@ -95,18 +95,20 @@ const UserProfiles: React.FC = () => {
     const checkFriendRequestStatus = async () => {
       try {
         const currentUser = auth.currentUser;
-
-        if (currentUser && userProfile && userProfile.uid) {
-          const userDocRef = doc(firestore, 'users', currentUser.uid);
-          const userDocSnapshot = await getDoc(userDocRef);
-
-          if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-
-            if (userData.friendRequests && userData.friendRequests.includes(userProfile.username)) {
+  
+        if (currentUser && userProfile && userProfile.username) {
+          const usersCollection = collection(firestore, 'users');
+          const usersQuery = query(usersCollection, where('username', '==', userProfile.username));
+          const userDocsSnapshot = await getDocs(usersQuery);
+  
+          if (!userDocsSnapshot.empty) {
+            const userDoc = userDocsSnapshot.docs[0];
+            const userData = userDoc.data();
+  
+            if (userData.friendRequests && userData.friendRequests.includes(currentUser.displayName || currentUser.email)) {
               // Friend request sent
               setFriendRequestStatus('sent');
-            } else if (userData.friends && userData.friends.includes(userProfile.username)) {
+            } else if (userData.friends && userData.friends.includes(currentUser.displayName || currentUser.email)) {
               // Already friends
               setFriendRequestStatus('friends');
             }
@@ -116,7 +118,7 @@ const UserProfiles: React.FC = () => {
         console.error('Error checking friend request status:', error);
       }
     };
-
+  
     checkFriendRequestStatus();
   }, [userProfile]);
 

@@ -49,24 +49,30 @@ const Notifications: React.FC = () => {
       console.error('Error updating friend requests in Firestore:', error);
     }
   };
-  const handleAcceptFriendRequest = async (username: string) => {
+  const handleAcceptFriendRequest = async (senderUsername: string) => {
     try {
       const currentUser = auth.currentUser;
   
       if (currentUser) {
+        // Extract the username from the email
+        const senderUsernameWithoutDomain = senderUsername.split('@')[0];
+  
         const currentUserDocRef = doc(firestore, 'users', currentUser.uid);
   
         // Fetch sender's user document based on username
-        const senderUserQuery = query(collection(firestore, 'users'), where('username', '==', username));
+        const senderUserQuery = query(collection(firestore, 'users'), where('username', '==', senderUsernameWithoutDomain));
         const senderUserQuerySnapshot = await getDocs(senderUserQuery);
+  
+        console.log('Sender username without domain:', senderUsernameWithoutDomain);
+        console.log('Sender user query snapshot:', senderUserQuerySnapshot.docs);
   
         if (!senderUserQuerySnapshot.empty) {
           const senderUserDocRef = senderUserQuerySnapshot.docs[0].ref;
   
           // Update the current user's document to add the new friend using a transaction
           await updateDoc(currentUserDocRef, {
-            friends: arrayUnion(username),
-            friendRequests: arrayRemove(username),
+            friends: arrayUnion(senderUsernameWithoutDomain),
+            friendRequests: arrayRemove(senderUsername),
           });
   
           // Update the sender's document to add the new friend
@@ -78,7 +84,7 @@ const Notifications: React.FC = () => {
           fetchFriendRequests();
           console.log('Friend request accepted successfully!');
         } else {
-          console.error('Sender not found. Username:', username);
+          console.error('Sender not found. Username without domain:', senderUsernameWithoutDomain);
           console.log('Sender query snapshot:', senderUserQuerySnapshot.docs);
         }
       }
@@ -86,6 +92,7 @@ const Notifications: React.FC = () => {
       console.error('Error accepting friend request:', error);
     }
   };
+  
   
 
   const handleRejectFriendRequest = async (username: string) => {
@@ -114,11 +121,12 @@ const Notifications: React.FC = () => {
         </IonHeader>
         <IonList>
           {friendRequests.map((requestUsername) => (
-            <IonItem key={requestUsername}>
-              <IonLabel>{`${requestUsername} sent you a friend request`}</IonLabel>
-              <IonButton onClick={() => handleAcceptFriendRequest(requestUsername)}>Accept</IonButton>
-              <IonButton onClick={() => handleRejectFriendRequest(requestUsername)}>Reject</IonButton>
-            </IonItem>
+          <IonItem key={requestUsername}>
+          <IonLabel>{`${requestUsername.split('@')[0]} sent you a friend request`}</IonLabel>
+          <IonButton onClick={() => handleAcceptFriendRequest(requestUsername)}>Accept</IonButton>
+          <IonButton onClick={() => handleRejectFriendRequest(requestUsername)}>Reject</IonButton>
+        </IonItem>
+        
           ))}
         </IonList>
       </IonContent>
