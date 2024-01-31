@@ -21,12 +21,12 @@ interface Comment {
 }
 
 interface PostCommentsProps {
-    postId: string;
-    comments: Comment[]; // Add this line
-    onAddComment: (commentText: string) => void;
-    onCloseComments: () => void;
-  }
-  
+  postId: string;
+  comments: Comment[]; // Add this line
+  onAddComment: (commentText: string) => void;
+  onCloseComments: () => void;
+}
+
 
 const PostComments: React.FC<PostCommentsProps> = ({
   postId,
@@ -101,7 +101,9 @@ const PostComments: React.FC<PostCommentsProps> = ({
     <IonCardContent className="post-comments-overlay">
       {/* Close button */}
       <div className="close-button" onClick={onCloseComments}>
-        <IonIcon icon={close} style={{ fontSize: '2rem' }} />
+        <IonIcon icon={close} style={{
+          fontSize: '2rem', color: 'white'
+        }} />
       </div>
       <div className="comments-container">
         {/* Display existing comments */}
@@ -140,6 +142,7 @@ const PostComments: React.FC<PostCommentsProps> = ({
             borderRadius: '10px',
             background: '#1b221f',
             color: 'white',
+            zIndex: '9000'
           }}
           type="text"
           placeholder="Add a comment..."
@@ -151,9 +154,10 @@ const PostComments: React.FC<PostCommentsProps> = ({
             fontSize: '1rem',
             padding: '0.7rem',
             borderRadius: '50px',
-            background: 'blue',
+            background: 'lightblue',
             verticalAlign: 'middle',
             textAlign: 'center',
+            color: 'white'
           }}
           icon={send}
           onClick={handleAddComment}
