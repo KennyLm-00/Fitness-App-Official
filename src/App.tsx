@@ -21,6 +21,8 @@ import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
 import Search from './pages/Search';
+import Splits from './pages/Splits';
+
 import UserProfiles from './pages/UserProfiles';
 import { RiSearch2Fill } from "react-icons/ri";
 
@@ -106,6 +108,9 @@ const App: React.FC = () => (
           </Route>
           <Route path="/notifications">
             <Notifications />
+          </Route>  
+          <Route path="/splits">
+            <Splits />
           </Route>
           <Route exact path="/">
             <Redirect to="/tab1" />

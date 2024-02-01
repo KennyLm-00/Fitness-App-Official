@@ -30,7 +30,7 @@ import { storage, auth, firestore } from '../firebase/firebaseConfig';
 import { useHistory } from 'react-router-dom';
 import { CiShare1 } from "react-icons/ci";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, ellipsisHorizontal, accessibility } from 'ionicons/icons';
 import DetailedView from './DetailedView'; // Import DetailedView
 import { FaPencilAlt } from "react-icons/fa";
 
@@ -57,20 +57,20 @@ const Tab3: React.FC = () => {
     const fetchData = async () => {
       try {
         const user = auth.currentUser;
-  
+
         if (!user) {
           console.error('User not authenticated.');
           history.push('/');
           return;
         }
-  
+
         const userId = user.uid;
-  
+
         // Fetch user data including the lift category
         const userDocRef = doc(firestore, 'users', userId);
         const userDocSnapshot = await getDoc(userDocRef);
         const userDocData = userDocSnapshot.data();
-  
+
         if (userDocData) {
           setUserName(userDocData.username); // Move this line here
           // console.log('User Document Data:', userDocData);
@@ -80,7 +80,7 @@ const Tab3: React.FC = () => {
           const userPostsCollection = collection(firestore, 'posts');
           const userPostsQuery = query(userPostsCollection, where('userId', '==', userId));
           const querySnapshot = await getDocs(userPostsQuery);
-  
+
           const userPostsData = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             imageUrl: doc.data().imageUrl,
@@ -89,30 +89,30 @@ const Tab3: React.FC = () => {
             caption: doc.data().caption,
             category: doc.data().category,
           }));
-  
+
           setPostsCount(userPostsData.length); // Set posts count
           setPosts(userPostsData);
           const gymPalsQuery = query(collection(firestore, 'users'), where('friends', 'array-contains', userDocData.username));
           const gymPalsSnapshot = await getDocs(gymPalsQuery);
           const gymPalsData = gymPalsSnapshot.docs.map((doc) => doc.data());
-        
+
           // console.log('Gym Pals Query:', gymPalsQuery);
           // console.log('Gym Pals Snapshot:', gymPalsSnapshot);
           // console.log('Gym Pals Data:', gymPalsData);
-        
+
           setGymPalsCount(gymPalsSnapshot.size); // Set gym pals count
-        
+
           // console.log('Gym Pals Count:', gymPalsSnapshot.size);
         }
       } catch (error) {
         console.error('Error retrieving user information and posts:', error);
       }
     };
-  
+
     fetchData();
   }, [userName, history]);
-  
-  
+
+
 
   const handlePostClick = (post: { id: string; imageUrl?: string | undefined; likes: number; likedBy: string[] }) => {
     setSelectedPost(post);
@@ -304,10 +304,14 @@ const Tab3: React.FC = () => {
       const userDocRef = doc(firestore, 'users', user.uid);
       // Update the 'liftCategory' field in the user's document
       updateDoc(userDocRef, { liftCategory: selectedCategory })
-        // .then(() => console.log('Lift category updated successfully'))
-        // .catch((error) => console.error('Error updating lift category:', error));
+      // .then(() => console.log('Lift category updated successfully'))
+      // .catch((error) => console.error('Error updating lift category:', error));
     }
   }, [selectedCategory]);
+  const handleSplitsClick = () => {
+    // Navigate to the "Splits" tab
+    history.push('/splits');
+  };
   return (
     <IonPage>
       <IonContent fullscreen>
@@ -328,9 +332,7 @@ const Tab3: React.FC = () => {
             </IonCardSubtitle>
 
             <IonButtons slot="end">
-              <IonButton onClick={handleLogout}>
-                <IonIcon style={{ color: "white" }} icon={logOutOutline} />
-              </IonButton>
+                <IonIcon onClick={handleLogout} style={{ color: "white",fontSize:'1.5rem' }} icon={logOutOutline} />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -379,10 +381,27 @@ const Tab3: React.FC = () => {
                       &nbsp;
                       Your gyms
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                      <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                    <IonCardSubtitle
+                      style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem', cursor: 'pointer' }}
+                    >
+                      <IonIcon
+                        icon={accessibility}
+                        style={{
+                          color: 'white',
+                          fontSize: '15px',
+                          background: 'rgb(255, 176, 87)',
+                          padding: '0.8rem',
+                          borderRadius: '50px',
+                          verticalAlign: 'middle',
+                        }}
+                      />
                       &nbsp;
-                        Splits 
+                      Splits
+                      &nbsp;
+                      <FaPencilAlt
+                        onClick={handleSplitsClick}
+                        style={{ fontSize: '0.8rem', fontWeight: 'bold' }}
+                      />
                     </IonCardSubtitle>
                   </IonCol>
                 </IonRow>
@@ -454,7 +473,7 @@ const Tab3: React.FC = () => {
                           )}
                         </IonCardSubtitle> */}
                       {/* Workouts */}
-                      
+
                     </IonRow>
                   </IonGrid>
                 </IonCardContent>
