@@ -247,7 +247,7 @@ const UserProfiles: React.FC = () => {
               <IonGrid>
                 <IonRow>
                   {/* Posts */}
-                  <IonCol size="4">
+                  <IonCol size="6">
                     <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                       {userPosts.length}
                       <br />
@@ -256,8 +256,8 @@ const UserProfiles: React.FC = () => {
                   </IonCol>
 
                   {/* Followers */}
-             <IonCol size="4">
-                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
+             <IonCol size="6">
+                    <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057' }}>
                       {userProfile && userProfile.friends ? userProfile.friends.length : 0}
                       <br />
                       Gym Pals
@@ -265,13 +265,13 @@ const UserProfiles: React.FC = () => {
                   </IonCol>
 
                   {/* Following */}
-                  <IonCol size="4">
+                  {/* <IonCol size="4">
                     <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                       300
                       <br />
                       Workouts
                     </IonCardSubtitle>
-                  </IonCol>
+                  </IonCol> */}
                 </IonRow>
               </IonGrid>
             </IonCardContent>

@@ -48,6 +48,7 @@ import calImage from '../images/cal.jpg';
 import powerImage from '../images/power.jpg';
 import oceanImage from '../images/body.jpg'; // Assuming you have an image named 'ocean.jpg'
 import crossImage from '../images/cross.jpg';
+
 const Tab1: React.FC = () => {
   const [userName, setUserName] = useState<string>('');
   const [userImageUrl, setUserImageUrl] = useState<string>('');
@@ -281,7 +282,7 @@ const Tab1: React.FC = () => {
             <IonButtons slot="end">
               {/* Use IonRouterLink for clean navigation */}
               <IonRouterLink routerLink="/notifications" routerDirection="forward" style={{ textDecoration: 'none', color: 'white' }}>
-                <IonIcon icon={notificationsOutline} style={{ fontSize: '27px', marginRight: '5px' }} />
+                <FaBell color='#ffb057' style={{ fontSize: '20px', marginRight: '5px' }} />
               </IonRouterLink>
             </IonButtons>
           </IonToolbar>

@@ -416,31 +416,45 @@ const Tab3: React.FC = () => {
                   <IonGrid>
                     <IonRow>
                       {/* Posts */}
-                      <IonCol size="4">
+                      <IonCol size="6">
                         <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
                           {postsCount}
                           <br />
-                          Posts
+                          Workouts
                         </IonCardSubtitle>
                       </IonCol>
 
                       {/* Gym Pals */}
-                      <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057', borderRight: '1px solid #ffb057' }}>
+                      <IonCol size="6">
+                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057' }}>
                           {gymPalsCount}
                           <br />
                           Gym Pals
                         </IonCardSubtitle>
                       </IonCol>
-
+                      {/* <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
+                          {postsCount >= 10 ? (
+                            <>
+                              <img src="/images/badge1.jpg" alt="Rookie Badge" style={{ width: '50px', marginBottom: '8px' }} />                              <br />
+                              
+                            </>
+                          ) : postsCount >= 5 ? (
+                            <>
+                              <img src="/images/badge1.jpg" alt="Rookie Badge" style={{ width: '50px', marginBottom: '8px' }} />                              <br />
+                              
+                            </>
+                          ) : postsCount >= 1 ? (
+                            <>
+                              <img src="/images/badge1.jpg" alt="Rookie Badge" style={{ width: '40px'}} />
+                              <br />
+                              
+                            </>
+                          ) : (
+                            <>No Badge</>
+                          )}
+                        </IonCardSubtitle> */}
                       {/* Workouts */}
-                      <IonCol size="4">
-                        <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                          300
-                          <br />
-                          Workouts
-                        </IonCardSubtitle>
-                      </IonCol>
+                      
                     </IonRow>
                   </IonGrid>
                 </IonCardContent>
