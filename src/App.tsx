@@ -22,6 +22,7 @@ import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
 import Search from './pages/Search';
 import Splits from './pages/Splits';
+import SplitDaysView from './pages/SplitDaysView'; // Import the new component
 
 import UserProfiles from './pages/UserProfiles';
 import { RiSearch2Fill } from "react-icons/ri";
@@ -73,12 +74,10 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          {/* <Route exact path="/Google">
-            <Google />
-          </Route> */}
+
           <Route path="/user/:username" component={UserProfiles} />
-          {/* <UserProfiles />
-        </Route> */}
+          <Route path="/split-days/:username" component={SplitDaysView} exact />
+
           <Route exact path="/tab1">
             <Tab1 />
           </Route>

@@ -28,7 +28,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
 import { getDocs, collection, doc, where, query, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 import DetailedView from './DetailedView'; // Import DetailedView
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, accessibility, caretForwardCircleOutline,caretForwardOutline } from 'ionicons/icons';
 const UserProfiles: React.FC = () => {
   const { username } = useParams<{ username?: string }>();
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -95,16 +95,16 @@ const UserProfiles: React.FC = () => {
     const checkFriendRequestStatus = async () => {
       try {
         const currentUser = auth.currentUser;
-  
+
         if (currentUser && userProfile && userProfile.username) {
           const usersCollection = collection(firestore, 'users');
           const usersQuery = query(usersCollection, where('username', '==', userProfile.username));
           const userDocsSnapshot = await getDocs(usersQuery);
-  
+
           if (!userDocsSnapshot.empty) {
             const userDoc = userDocsSnapshot.docs[0];
             const userData = userDoc.data();
-  
+
             if (userData.friendRequests && userData.friendRequests.includes(currentUser.displayName || currentUser.email)) {
               // Friend request sent
               setFriendRequestStatus('sent');
@@ -118,7 +118,7 @@ const UserProfiles: React.FC = () => {
         console.error('Error checking friend request status:', error);
       }
     };
-  
+
     checkFriendRequestStatus();
   }, [userProfile]);
 
@@ -217,13 +217,23 @@ const UserProfiles: React.FC = () => {
                   &nbsp;
                   Gyms
                 </IonCardSubtitle>
+                <IonRouterLink routerLink={`/split-days/${username}`}>
+                  <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
+                    <IonIcon icon={accessibility} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                    &nbsp;
+                    Splits 
+                    &nbsp;
+                    <IonIcon icon={caretForwardOutline}style={{ color: 'white',verticalAlign: 'middle',fontSize: '20px',  }}  />
+
+                  </IonCardSubtitle>
+                </IonRouterLink>
                 <IonCardSubtitle style={{ textAlign: 'left', fontSize: '0.8rem' }}>
                   {friendRequestStatus === 'sent' ? (
-                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block',width:'100%' }}>
+                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block', width: '100%' }}>
                       Sent Request
                     </span>
                   ) : friendRequestStatus === 'friends' ? (
-                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block',width:'100%',textAlign:'center'}}>
+                    <span style={{ color: 'white', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', display: 'inline-block', width: '100%', textAlign: 'center' }}>
                       Friends!
                     </span>
                   ) : (
@@ -256,7 +266,7 @@ const UserProfiles: React.FC = () => {
                   </IonCol>
 
                   {/* Followers */}
-             <IonCol size="6">
+                  <IonCol size="6">
                     <IonCardSubtitle style={{ textAlign: 'center', color: 'white', borderLeft: '1px solid #ffb057' }}>
                       {userProfile && userProfile.friends ? userProfile.friends.length : 0}
                       <br />
