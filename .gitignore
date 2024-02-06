@@ -30,3 +30,5 @@ yarn-error.log*
 
 /src/firebase/firebaseConfig.js
 /src/firebase/firebaseConfig2.d.ts
+
+index.html
