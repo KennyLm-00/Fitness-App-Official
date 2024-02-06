@@ -58,6 +58,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import GymClaimPage from './pages/GymClaim/GymClaimPage';
 const iconSize = 25; // Set the desired size
 const customActiveColor = '#ff0000';
 const customInactiveColor = 'red'; // Change this to your desired inactive color
@@ -78,6 +79,9 @@ const App: React.FC = () => (
           <Route path="/user/:username" component={UserProfiles} />
           <Route path="/split-days/:username" component={SplitDaysView} exact />
 
+          <Route exact path="/gymclaim">
+            <GymClaimPage />
+          </Route>
           <Route exact path="/tab1">
             <Tab1 />
           </Route>
