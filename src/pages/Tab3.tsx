@@ -312,6 +312,12 @@ const Tab3: React.FC = () => {
     // Navigate to the "Splits" tab
     history.push('/splits');
   };
+  const handleGymsClick = () => {
+    // Navigate to the GymClaimPage
+    history.push('/gymclaim');
+    window.location.reload();
+
+  };
   return (
     <IonPage>
       <IonContent fullscreen>
@@ -332,7 +338,7 @@ const Tab3: React.FC = () => {
             </IonCardSubtitle>
 
             <IonButtons slot="end">
-                <IonIcon onClick={handleLogout} style={{ color: "white",fontSize:'1.5rem' }} icon={logOutOutline} />
+              <IonIcon onClick={handleLogout} style={{ color: "white", fontSize: '1.5rem' }} icon={logOutOutline} />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -376,8 +382,21 @@ const Tab3: React.FC = () => {
                         </IonButton>
                       )}
                     </IonCardSubtitle>
-                    <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                      <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                    <IonCardSubtitle
+                      style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem', cursor: 'pointer' }}
+                      onClick={handleGymsClick} // Add this onClick handler
+                    >
+                      <IonIcon
+                        icon={location}
+                        style={{
+                          color: 'white',
+                          fontSize: '15px',
+                          background: 'rgb(255, 176, 87)',
+                          padding: '0.8rem',
+                          borderRadius: '50px',
+                          verticalAlign: 'middle',
+                        }}
+                      />
                       &nbsp;
                       Your gyms
                     </IonCardSubtitle>
