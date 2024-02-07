@@ -149,14 +149,14 @@ const Main: React.FC = () => {
                       placeholder="Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      style={{ padding: '10px', marginBottom: '10px' }}
+                      style={{ padding: '10px',color:'white', marginBottom: '10px' }}
                     />
                     <input
                       type="password"
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      style={{ padding: '10px', marginBottom: '20px' }}
+                      style={{ padding: '10px', color:'white',marginBottom: '20px' }}
                     />
                     <br></br>
                     <IonCheckbox style={{ paddingBottom: '1rem' }}

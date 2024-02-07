@@ -398,10 +398,16 @@ const Tab3: React.FC = () => {
                         }}
                       />
                       &nbsp;
-                      Your gyms
+                      Claim Gyms
+                      &nbsp;
+                      <FaPencilAlt
+                        onClick={handleGymsClick}
+                        style={{ fontSize: '0.8rem', fontWeight: 'bold' }}
+                      />
                     </IonCardSubtitle>
                     <IonCardSubtitle
                       style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem', cursor: 'pointer' }}
+                      onClick={handleSplitsClick}
                     >
                       <IonIcon
                         icon={accessibility}
