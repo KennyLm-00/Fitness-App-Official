@@ -21,6 +21,7 @@ import {
   IonChip,
   IonAvatar,
   IonLabel,
+  IonAlert,
   IonModal,
   IonIcon,
 } from '@ionic/react';
@@ -28,7 +29,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { auth, firestore } from '../firebase/firebaseConfig';
 import { getDocs, collection, doc, where, query, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 import DetailedView from './DetailedView'; // Import DetailedView
-import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, accessibility, caretForwardCircleOutline,caretForwardOutline } from 'ionicons/icons';
+import { barbell, imageOutline, arrowBack, trashOutline, checkmark, location, personAdd, logOutOutline, person, heart, heartOutline, accessibility, caretForwardCircleOutline, caretForwardOutline } from 'ionicons/icons';
 const UserProfiles: React.FC = () => {
   const { username } = useParams<{ username?: string }>();
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -42,6 +43,8 @@ const UserProfiles: React.FC = () => {
     caption?: string;
     category?: string;
   } | null>(null);
+  const [showGymsAlert, setShowGymsAlert] = useState(false);
+  const [claimedGyms, setClaimedGyms] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchUserProfileAndPosts = async () => {
@@ -167,6 +170,36 @@ const UserProfiles: React.FC = () => {
       console.error('Error sending friend request:', error);
     }
   };
+  const fetchClaimedGyms = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const gymsClaimed = userDoc.data()?.gymsClaimed || [];
+          setClaimedGyms(gymsClaimed);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching claimed gyms:', error);
+    }
+  };
+
+  // Call this function in your useEffect
+  fetchClaimedGyms();
+
+  const handleGymsClick = () => {
+    // When "Gyms" section is clicked, show the alert
+    setShowGymsAlert(true);
+  };
+
+  const closeGymsAlert = () => {
+    // Close the alert when done viewing claimed gyms
+    setShowGymsAlert(false);
+  };
+
   return (
     <IonPage>
       <IonContent className='user-profile' fullscreen>
@@ -212,18 +245,41 @@ const UserProfiles: React.FC = () => {
                   &nbsp;
                   {userProfile && userProfile.liftCategory ? userProfile.liftCategory : 'Lift Category'}
                 </IonCardSubtitle>
-                <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
-                  <IonIcon icon={location} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
+                <IonCardSubtitle
+                  style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}
+                  onClick={handleGymsClick}
+                >
+                  <IonIcon
+                    icon={location}
+                    style={{
+                      color: 'white',
+                      fontSize: '15px',
+                      background: 'rgb(255, 176, 87)',
+                      padding: '0.8rem',
+                      borderRadius: '50px',
+                      verticalAlign: 'middle',
+                    }}
+                  />
                   &nbsp;
                   Gyms
+                  &nbsp;
+                  <IonIcon icon={caretForwardOutline} style={{ color: 'white', verticalAlign: 'middle', fontSize: '20px', }} />
+
                 </IonCardSubtitle>
+                <IonAlert
+                  isOpen={showGymsAlert}
+                  onDidDismiss={closeGymsAlert}
+                  header={username ? `${username}'s Claimed Gyms` : 'Loading user...'}
+                  message={claimedGyms.map((gymName: string) => `${gymName}\n`).join('')}
+                  buttons={['OK']}
+                />
                 <IonRouterLink routerLink={`/split-days/${username}`}>
                   <IonCardSubtitle style={{ textAlign: 'left', color: 'white', fontSize: '0.8rem' }}>
                     <IonIcon icon={accessibility} style={{ color: 'white', fontSize: '15px', background: 'rgb(255, 176, 87)', padding: '0.8rem', borderRadius: '50px', verticalAlign: 'middle' }} />
                     &nbsp;
-                    Splits 
+                    Splits
                     &nbsp;
-                    <IonIcon icon={caretForwardOutline}style={{ color: 'white',verticalAlign: 'middle',fontSize: '20px',  }}  />
+                    <IonIcon icon={caretForwardOutline} style={{ color: 'white', verticalAlign: 'middle', fontSize: '20px', }} />
 
                   </IonCardSubtitle>
                 </IonRouterLink>

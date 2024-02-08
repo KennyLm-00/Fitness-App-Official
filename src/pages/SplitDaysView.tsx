@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonPage, IonToolbar, IonContent, IonTitle, IonCard, IonCardHeader, IonCardTitle, IonIcon, IonCardContent, IonGrid, IonRow, IonCol } from '@ionic/react';
+import { IonPage, IonToolbar, IonContent, IonTitle, IonCard, IonCardHeader, IonCardTitle, IonIcon, IonCardContent, IonGrid, IonRow, IonCol, IonCardSubtitle } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 import { getDocs, collection, where, query } from 'firebase/firestore';
 import { firestore } from '../firebase/firebaseConfig';
@@ -46,7 +46,7 @@ const SplitDaysView: React.FC = () => {
 
         fetchUserSplitDays();
     }, [username]);
-
+//style = {{boxShadow:'none'}}
     return (
         <IonPage>
             <IonContent>
@@ -54,19 +54,19 @@ const SplitDaysView: React.FC = () => {
                     <button slot="start" onClick={() => history.goBack()} style={{ padding: '0.4rem', background: 'transparent' }}>
                         <IonIcon icon={arrowBack} style={{ fontSize: '2rem' }} />
                     </button>
-                    <IonTitle>{username} Splits!</IonTitle>
+                    <IonTitle style={{textAlign:'center'}}>{username} Splits!</IonTitle>
                 </IonToolbar>
                 <IonGrid>
         <IonRow>
             {splitDays.map((splitDay) => (
                 <IonCol key={splitDay.day} size="12" size-sm="12" style={{ marginBottom: '10px' }}>
-                    <IonCard style = {{boxShadow:'none'}}>
+                    <IonCard>
                         <IonCardContent>
                             <IonRow className="ion-align-items-center">
                                 <IonCol size="4">
-                                    <IonCardTitle>{splitDay.day}:</IonCardTitle>
+                                    <IonCardSubtitle style={{color:'white', fontSize:'1rem'}}>{splitDay.day}:</IonCardSubtitle>
                                 </IonCol>
-                                <IonCol size="6" style = {{color:'white'}}>
+                                <IonCol size="8" style = {{color:'white'}}>
                                     {Array.isArray(splitDay.muscle) ? (
                                         splitDay.muscle.map((muscle: string, index: number) => (
                                             <IonRow key={index} className="ion-align-items-center">
@@ -77,7 +77,7 @@ const SplitDaysView: React.FC = () => {
                                         ))
                                     ) : (
                                         <IonRow className="ion-align-items-center">
-                                            <IonCol size="6" size-md="4">
+                                            <IonCol size="6" size-md="6">
                                                 {splitDay.muscle}
                                             </IonCol>
                                         </IonRow>

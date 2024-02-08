@@ -145,7 +145,7 @@ const Splits: React.FC = () => {
     return (
         <IonPage>
             <IonHeader>
-                <IonToolbar className="ion-toolbar-custom" style={{ boxShadow: 'none', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>
+                <IonToolbar className="ion-toolbar-custom ion-text-center" style={{ boxShadow: 'none', borderBottomRightRadius: '0', borderBottomLeftRadius: '0' }}>
                     <button slot="start" onClick={() => history.goBack()} style={{ padding: '0.4rem', background: 'transparent' }}>
                         <IonIcon icon={arrowBack} style={{ fontSize: '2rem' }} />
                     </button>

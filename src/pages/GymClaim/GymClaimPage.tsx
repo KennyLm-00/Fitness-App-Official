@@ -171,8 +171,8 @@ const GymClaimPage: React.FC = () => {
               label={gym.name}
               onClick={() => handleMarkerClick(gym)}
               icon={{
-                url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                scaledSize: new window.google.maps.Size(32, 32),
+                url: 'https://i.imgur.com/RaiJOeE.png',
+                scaledSize: new window.google.maps.Size(100, 100),
               }}
             />
           ))}
@@ -194,7 +194,7 @@ const GymClaimPage: React.FC = () => {
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
         header={`Add ${selectedGym?.name || 'Gym'} to your profile?`}
-        message={`Do you want to add ${selectedGym?.name || 'Gym'} to your profile?`}
+        message={`Do you want to add ${selectedGym?.name || 'Gym'} to your claimed gyms?`}
         buttons={[
           {
             text: 'Cancel',
