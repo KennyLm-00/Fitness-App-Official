@@ -136,7 +136,11 @@ const GymClaimPage: React.FC = () => {
       setShowErrorToast(true);
     }
   };
-
+  const openPopover = (event: any) => {
+    event.persist();
+    setPopoverEvent(event);
+    setShowPopover(true);
+  };
   return (
     <IonContent>
       <div style={{ position: 'absolute', top: '50px', left: '10px', zIndex: 9999 }}>
@@ -144,7 +148,6 @@ const GymClaimPage: React.FC = () => {
           Claimed Gyms <IonIcon icon={caretDownOutline} />
         </IonButton>
       </div>
-
       <LoadScript
         googleMapsApiKey="AIzaSyDNaMIlTmrnzOONweTwzTKgkkycbCA5qUc"
         libraries={['places']}
@@ -155,14 +158,95 @@ const GymClaimPage: React.FC = () => {
             height: '100vh',
           }}
           center={userLocation}
-          zoom={15}
+          zoom={19}
           onLoad={onLoad}
           onUnmount={onUnmount}
         >
-          {map && <Marker position={userLocation} />}
+          {map && <Marker position={userLocation} label="You" />}
+
+          {gyms.map((gym) => (
+            <Marker
+              key={gym.id}
+              position={{ lat: gym.lat, lng: gym.lng }}
+              label={gym.name}
+              onClick={() => handleMarkerClick(gym)}
+              icon={{
+                url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                scaledSize: new window.google.maps.Size(32, 32),
+              }}
+            />
+          ))}
+
+          <Circle
+            center={userLocation}
+            radius={10}
+            options={{
+              strokeColor: '#ff0000',
+              fillColor: '#ff0000',
+              fillOpacity: 0.2,
+              strokeOpacity: 0.8,
+            }}
+          />
         </GoogleMap>
       </LoadScript>
 
+      <IonAlert
+        isOpen={showAlert}
+        onDidDismiss={() => setShowAlert(false)}
+        header={`Add ${selectedGym?.name || 'Gym'} to your profile?`}
+        message={`Do you want to add ${selectedGym?.name || 'Gym'} to your profile?`}
+        buttons={[
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              setSelectedGym(null);
+            },
+          },
+          {
+            text: 'Add',
+            handler: handleAddGym,
+          },
+        ]}
+      />
+
+      <IonToast
+        isOpen={showSuccessToast}
+        onDidDismiss={() => setShowSuccessToast(false)}
+        message="Nice! Added to profile!"
+        duration={3000}
+        position="bottom"
+        color="success"
+      />
+
+      <IonToast
+        isOpen={showErrorToast}
+        onDidDismiss={() => setShowErrorToast(false)}
+        message="Gym is outside the allowed radius"
+        duration={3000}
+        position="bottom"
+        color="warning"
+      />
+
+      <IonButton expand="full" onClick={(e) => openPopover(e)}>
+        See Claimed Gyms
+      </IonButton>
+
+      <IonPopover
+        isOpen={showPopover}
+        onDidDismiss={() => setShowPopover(false)}
+        event={popoverEvent}
+      >
+        <IonContent>
+          <IonList>
+            {claimedGyms.map((gymName) => (
+              <IonItem key={gymName}>
+                {gymName}
+              </IonItem>
+            ))}
+          </IonList>
+        </IonContent>
+      </IonPopover>
       {/* rest of the component */}
     </IonContent>
   );
