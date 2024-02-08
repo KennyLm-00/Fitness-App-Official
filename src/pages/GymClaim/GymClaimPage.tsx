@@ -1,11 +1,31 @@
-// Install dependencies:
-// npm install @react-google-maps/api
-// npm install @types/googlemaps --save-dev
+import React, { useEffect, useState } from 'react';
+import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api';
+import {
+  IonAlert,
+  IonContent,
+  IonButton,
+  IonIcon,
+  IonList,
+  IonItem,
+  IonPopover,
+  IonToast,
+} from '@ionic/react';
+import haversine from 'haversine-distance';
+import { getDocs, getDoc, collection, updateDoc, doc, arrayUnion } from 'firebase/firestore';
+import { auth, firestore } from '../../firebase/firebaseConfig';
+import { caretDownOutline } from 'ionicons/icons';
 
-import React, { useState, useEffect } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+const GymClaimPage: React.FC = () => {
+  const [selectedGym, setSelectedGym] = useState<any>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [gyms, setGyms] = useState<{ id: string; lat: number; lng: number; name: string }[]>([]);
+  const [showPopover, setShowPopover] = useState(false);
+  const [popoverEvent, setPopoverEvent] = useState<any>(null);
+  const [claimedGyms, setClaimedGyms] = useState<string[]>([]);
 
-const MapContainer: React.FC = () => {
+  const gymsCollection = collection(firestore, 'gyms');
   const [map, setMap] = useState(null as google.maps.Map | null);
   const [userLocation, setUserLocation] = useState({ lat: 0, lng: 0 });
 
@@ -31,26 +51,121 @@ const MapContainer: React.FC = () => {
   const onUnmount = () => {
     setMap(null);
   };
+  useEffect(() => {
+    const fetchGyms = async () => {
+      try {
+        const querySnapshot = await getDocs(gymsCollection);
+        const gymsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          lat: doc.data().lat,
+          lng: Number(doc.data().lng),
+          name: doc.data().name,
+        }));
+        setGyms(gymsData);
+
+        console.log('gymsData:', gymsData);
+      } catch (error) {
+        console.error('Error fetching gyms:', error);
+      }
+    };
+
+    const fetchClaimedGyms = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            const gymsClaimed = userDoc.data()?.gymsClaimed || [];
+            setClaimedGyms(gymsClaimed);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching claimed gyms:', error);
+      }
+    };
+
+    fetchGyms();
+    fetchClaimedGyms();
+  }, []);
+
+  const handleMarkerClick = (gym: any) => {
+    setSelectedGym(gym);
+    setShowAlert(true);
+  };
+
+  const canAddGym = (selectedGym: any) => {
+    return (
+      !!userLocation &&
+      !!selectedGym &&
+      'lat' in selectedGym &&
+      'lng' in selectedGym &&
+      haversine(userLocation, { lat: selectedGym.lat, lng: selectedGym.lng }) <= 10
+    );
+  };
+
+  const handleAddGym = async () => {
+    console.log('Selected Gym:', selectedGym);
+
+    if (canAddGym(selectedGym) && selectedGym.name) {
+      try {
+        const user = auth.currentUser;
+
+        if (user) {
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            await updateDoc(userDocRef, { gymsClaimed: arrayUnion(selectedGym.name) });
+
+            console.log(`Added ${selectedGym.name} to the profile`);
+            setShowSuccessToast(true);
+            setSelectedGym(null);
+          } else {
+            console.error('User document not found.');
+            setShowErrorToast(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error updating user document:', error);
+        setShowErrorToast(true);
+      }
+    } else {
+      console.error('Selected gym is outside the allowed radius or its name is undefined');
+      setShowErrorToast(true);
+    }
+  };
 
   return (
-    <LoadScript
-      googleMapsApiKey="AIzaSyDNaMIlTmrnzOONweTwzTKgkkycbCA5qUc"
-      libraries={['places']}
-    >
-      <GoogleMap
-        mapContainerStyle={{
-          width: '100%',
-          height: '100vh',
-        }}
-        center={userLocation}
-        zoom={15}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
+    <IonContent>
+      <div style={{ position: 'absolute', top: '50px', left: '10px', zIndex: 9999 }}>
+        <IonButton onClick={() => setShowPopover(true)}>
+          Claimed Gyms <IonIcon icon={caretDownOutline} />
+        </IonButton>
+      </div>
+
+      <LoadScript
+        googleMapsApiKey="AIzaSyDNaMIlTmrnzOONweTwzTKgkkycbCA5qUc"
+        libraries={['places']}
       >
-        {map && <Marker position={userLocation} />}
-      </GoogleMap>
-    </LoadScript>
+        <GoogleMap
+          mapContainerStyle={{
+            width: '100%',
+            height: '100vh',
+          }}
+          center={userLocation}
+          zoom={15}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+        >
+          {map && <Marker position={userLocation} />}
+        </GoogleMap>
+      </LoadScript>
+
+      {/* rest of the component */}
+    </IonContent>
   );
 };
 
-export default MapContainer;
+export default GymClaimPage;
