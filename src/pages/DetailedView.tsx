@@ -24,6 +24,7 @@ import {
 } from '@ionic/react'; import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
 import { CiShare1 } from "react-icons/ci";
 import { heart, heartOutline, barbellOutline, arrowBack, ellipsisHorizontal } from 'ionicons/icons';
+import PostComments from './PostComments'; // Make sure to import PostComments from the correct path
 
 const DetailedView: React.FC<{
     post: {
@@ -31,23 +32,28 @@ const DetailedView: React.FC<{
         imageUrl?: string | undefined;
         likes: number;
         likedBy: string[];
-        caption?: string; // Include caption property
-        category?: string; // Include category property
+        caption?: string;
+        category?: string;
+        comments?: any[]; // Add comments property
     } | null;
     username: string;
-    userImageUrl: string; // Add userImageUrl property
+    userImageUrl: string;
     onClose: () => void;
     onLike: (postId: string) => void;
 }> = ({ post, username, userImageUrl, onClose, onLike }) => {
-    if (!post) {
-        return null;
-    }
+    const [showComments, setShowComments] = useState(false);
 
     const handleBackButtonClick = () => {
         onClose();
         window.location.reload(); // Refresh the page
     };
+    const handleLikeClick = () => {
+        onLike(post?.id || '');
+    };
 
+    const handleToggleCommentsClick = () => {
+        setShowComments(!showComments);
+    };
     return (
         <IonPage>
             <IonContent style={{ margin: 'auto' }}>
@@ -70,26 +76,39 @@ const DetailedView: React.FC<{
                     <IonChip style={{ background: '#ffb057' }}>
                         <IonIcon style={{ color: 'white' }} icon={barbellOutline} />
                         <IonLabel style={{ fontWeight: 'bold' }}>
-                            {post.category}
+                            {post?.category ?? ''}
                         </IonLabel>
                     </IonChip>
-                    <IonCardContent style={{ color: 'white' }}>{post.caption}</IonCardContent>
+                    <IonCardContent style={{ color: 'white' }}>{post?.caption ?? ''}</IonCardContent>
                     <IonCardContent>
-                        {post.imageUrl && <img src={post.imageUrl} alt={`Detailed View`} style={{ width: '100%', borderRadius: '8px' }} />}
+                        {post?.imageUrl && <img src={post.imageUrl} alt={`Detailed View`} style={{ width: '100%', borderRadius: '8px' }} />}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <IonIcon
-                                    icon={post.likedBy.includes(username) ? heart : heartOutline}
-                                    style={{ fontSize: '24px', color: post.likedBy.includes(username) ? 'red' : 'white' }}
-                                    onClick={() => onLike(post.id)}
+                                    icon={(post?.likedBy.includes(username) ?? false) ? heart : heartOutline}
+                                    style={{ fontSize: '24px', color: (post?.likedBy.includes(username) ?? false) ? 'red' : 'white' }}
+                                    onClick={() => onLike(post?.id || '')}
                                 />
-                                <span style={{ color: 'white', marginLeft: '5px' }}>{post.likes}</span>
+                                <span style={{ color: 'white', marginLeft: '5px' }}>{post?.likes ?? 0}</span>
                             </div>
                             <div>
-                                <HiOutlineChatBubbleBottomCenterText style={{ fontSize: '24px', color: 'white', fontWeight: '100' }} />
+                                <HiOutlineChatBubbleBottomCenterText
+                                    style={{ fontSize: '24px', color: 'white', fontWeight: '100', cursor: 'pointer' }}
+                                    onClick={handleToggleCommentsClick}
+                                />
                                 <CiShare1 style={{ fontSize: '24px', color: 'white' }} />
                             </div>
                         </div>
+
+                        {/* Display comments if showComments is true */}
+                        {showComments && (
+                            <PostComments
+                                postId={post?.id || ''}
+                                comments={post?.comments || []}
+                                onAddComment={(commentText: string) => {/* Implement this if needed */ }}
+                                onCloseComments={handleToggleCommentsClick}
+                            />
+                        )}
                     </IonCardContent>
                 </IonCard>
             </IonContent>

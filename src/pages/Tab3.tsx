@@ -540,11 +540,6 @@ const Tab3: React.FC = () => {
                         ]}
                       />
                       <IonCard onClick={() => handlePostClick(post)} style={{ borderRadius: '0px' }}>
-                        {/* <IonCardHeader>
-                          <IonCardSubtitle style={{ textAlign: 'center', color: 'white' }}>
-                            Post
-                          </IonCardSubtitle>
-                        </IonCardHeader> */}
                         {post.imageUrl && (
                           <img src={post.imageUrl} alt={`Card ${post.id}`} style={{ width: '100%', borderRadius: '0px' }} />
                         )}
@@ -562,7 +557,7 @@ const Tab3: React.FC = () => {
                         username={userName}
                         userImageUrl={updatedImageUrl || auth.currentUser?.photoURL || ''}
                         onClose={closeDetailedView}
-                        onLike={(postId) => handleLike(postId, userName)}
+                        onLike={async (postId: string) => await handleLike(postId, userName)}
                       />
                     </IonModal>
                   )}
